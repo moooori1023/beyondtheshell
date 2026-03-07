@@ -294,32 +294,31 @@
         function awakenGhost() {
             const inputVal = document.getElementById('bday-input').value;
             if(inputVal.length !== 4) { alert("请输入完整的四位数字（如 0203）"); return; }
-            const month = parseInt(inputVal.substring(0, 2)); const day = parseInt(inputVal.substring(2, 4));
+            let month = parseInt(inputVal.substring(0, 2)); let day = parseInt(inputVal.substring(2, 4));
             if(month < 1 || month > 12 || day < 1 || day > 31) { alert("坐标格式有误，请输入合法日期"); return; }
+
+            // ⚠️ 修复 2：0101 与 0616 互换逻辑
+            let calcMonth = month, calcDay = day;
+            if (inputVal === "0101") { calcMonth = 6; calcDay = 16; }
+            else if (inputVal === "0616") { calcMonth = 1; calcDay = 1; }
 
             let colorDesc = "", phaseName = "";
             ghostMaterial.color.set('#fff'); ghostMaterial.emissive.set('#000'); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.5; ghostMaterial.transmission = 0.0; ghostMaterial.ior = 1.5; ghostMaterial.thickness = 0.0; ghostMaterial.clearcoat = 0.0; ghostMaterial.opacity = 1.0; ghostMaterial.emissiveIntensity = 0.0;
 
             if (inputVal === "0203") {
-                // ⚠️ 修正 1：调淡 0203 蓝色，通过调高明度(L)至 0.8 实现混合白色的效果
                 const uniqueColor = new THREE.Color().setHSL(0.645, 0.45, 0.8);
-                ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; colorDesc = "调淡的丹宁蓝频段"; phaseName = "暗物质瓷";
+                ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; 
+                // ⚠️ 修复 1：更换形容词
+                colorDesc = "月光浸染的丹宁蓝频段"; phaseName = "暗物质瓷";
             } else {
-                let rawHue = ((month - 1) * 31 + day) % 360; if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360;
-                const hue = rawHue / 360; const saturation = 0.2 + (day / 31) * 0.25; const lightness = 0.35 + (month % 3) * 0.15; const uniqueColor = new THREE.Color().setHSL(hue, saturation, lightness);
+                let rawHue = ((calcMonth - 1) * 31 + calcDay) % 360; if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360;
+                const hue = rawHue / 360; const saturation = 0.2 + (calcDay / 31) * 0.25; const lightness = 0.35 + (calcMonth % 3) * 0.15; const uniqueColor = new THREE.Color().setHSL(hue, saturation, lightness);
                 if (rawHue < 50) colorDesc = "生锈的琥珀金频段"; else if (rawHue < 80) colorDesc = "黯淡的微光绿频段"; else if (rawHue < 170) colorDesc = "深海的冰蓝频段"; else if (rawHue < 250) colorDesc = "哑光的丹宁频段"; else if (rawHue < 300) colorDesc = "褪色的赛博紫频段"; else colorDesc = "低保真的千禧粉频段";
-                const phaseVal = (month * 7 + day * 11) % 6;
-                
-                // ⚠️ 修正 2：强制锁定 opacity 为 1.0，防止 0616 及其他日期出现“全透明”无法观测的情况
+                const phaseVal = (calcMonth * 7 + calcDay * 11) % 6;
                 ghostMaterial.opacity = 1.0;
-                
                 if (phaseVal === 0) { ghostMaterial.color.set('#aaaaaa'); ghostMaterial.emissive.set('#555555'); ghostMaterial.metalness = 1.0; ghostMaterial.roughness = 0.05; phaseName = "赛博液态银"; ghostLight.color.set('#ffffff'); ghostLight.intensity = 2.0;
-                } else if (phaseVal === 1) { 
-                    ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 0.6; // 调低透射，增加实体感
-                    ghostMaterial.ior = 1.33; ghostMaterial.roughness = 0.1; ghostMaterial.thickness = 1.5; phaseName = "灵动水态"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 0.5;
-                } else if (phaseVal === 2) { 
-                    ghostMaterial.color.copy(uniqueColor).multiplyScalar(0.4); // 增加底色亮度
-                    ghostMaterial.transmission = 0.7; ghostMaterial.ior = 1.55; ghostMaterial.roughness = 0.02; ghostMaterial.thickness = 2.0; ghostMaterial.attenuationColor = uniqueColor; ghostMaterial.attenuationDistance = 0.5; phaseName = "高折射琉璃"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 0.4;
+                } else if (phaseVal === 1) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 0.6; ghostMaterial.ior = 1.33; ghostMaterial.roughness = 0.1; ghostMaterial.thickness = 1.5; phaseName = "灵动水态"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 0.5;
+                } else if (phaseVal === 2) { ghostMaterial.color.copy(uniqueColor).multiplyScalar(0.4); ghostMaterial.transmission = 0.7; ghostMaterial.ior = 1.55; ghostMaterial.roughness = 0.02; ghostMaterial.thickness = 2.0; ghostMaterial.attenuationColor = uniqueColor; ghostMaterial.attenuationDistance = 0.5; phaseName = "高折射琉璃"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 0.4;
                 } else if (phaseVal === 3) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.metalness = 0.8; ghostMaterial.roughness = 0.5; ghostMaterial.emissive.copy(uniqueColor); phaseName = "哑光钛素"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0;
                 } else if (phaseVal === 4) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.metalness = 0.2; ghostMaterial.roughness = 0.6; ghostMaterial.transmission = 0.4; phaseName = "色散雾化晶体"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 1.0;
                 } else { ghostMaterial.color.set('#1a1a1a'); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; phaseName = "暗物质瓷"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; }
