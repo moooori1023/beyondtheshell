@@ -27,8 +27,9 @@
         #glass-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(10, 15, 20, 0.45); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px);
+            /* ⚠️ 修复：增加模糊雾度至 18px，代替阴影，确保坐标文字在手机端高光下清晰可见 */
+            backdrop-filter: blur(18px); 
+            -webkit-backdrop-filter: blur(18px);
             z-index: 5; transition: opacity 2.5s ease; pointer-events: none;
         }
 
@@ -42,9 +43,10 @@
             text-align: center; width: 90%; max-width: 520px; padding: 0;
             margin-bottom: clamp(20px, 5vh, 40px);
         }
+        /* ⚠️ 修复：剔除所有引导文字的阴影 */
         #intro-box h1 {
             font-size: clamp(16px, 4vw, 20px); font-weight: 400; letter-spacing: 5px; 
-            margin-bottom: 15px; color: #fff; line-height: 1.4;
+            margin-bottom: 15px; color: #fff; line-height: 1.4; text-shadow: none;
         }
         .en-title {
             display: block; font-size: clamp(9px, 2vw, 11px); font-family: monospace; 
@@ -52,7 +54,7 @@
         }
         #intro-box p {
             font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; 
-            letter-spacing: 2px; color: rgba(255,255,255,0.85);
+            letter-spacing: 2px; color: rgba(255,255,255,0.85); text-shadow: none;
         }
 
         .btn-style { 
@@ -92,20 +94,25 @@
             will-change: transform, opacity, filter, letter-spacing;
         }
 
+        /* ⚠️ 修复：剔除坐标文字的阴影，微调不透明度和字重，确保在加强的遮罩上清晰可见 */
         .ghost-header {
-            font-size: clamp(9px, 2vw, 11px); color: #ccc; margin-bottom: clamp(10px, 2.5vh, 15px); 
-            font-family: monospace; letter-spacing: 2px; font-weight: 300; line-height: 1.6;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.5); 
+            font-size: clamp(9px, 2vw, 11px); color: rgba(255,255,255,0.8); margin-bottom: clamp(10px, 2.5vh, 15px); 
+            font-family: monospace; letter-spacing: 2px; font-weight: 400; line-height: 1.6;
+            text-shadow: none; 
         }
         
+        /* ⚠️ 修复：剔除解析词的阴影，确保文字清晰。允许自然舒展完整显示 */
         #ghost-oracle {
-            font-size: clamp(11.5px, 2.8vw, 13px); color: #ddd; font-weight: 300; 
-            letter-spacing: 1.5px; line-height: 2.0; white-space: normal;
+            font-size: clamp(11.5px, 2.8vw, 13px); color: rgba(255,255,255,0.85); font-weight: 300; 
+            letter-spacing: 1.5px; line-height: 1.95; white-space: normal; text-shadow: none;
         }
 
+        /* ⚠️ 修复：剔除箴言的阴影。强制两行内排下并完整显示 */
         #ghost-quote {
-            font-size: clamp(11.5px, 2.8vw, 13px); color: #bbb; font-weight: 300; 
-            letter-spacing: 1.5px; display: none; opacity: 0; font-style: italic; line-height: 2.0;
+            /* ⚠️ 修复：在Notion环境下，强制使用较小的固定字号和精准行高，确保这两行神谕整齐且完整 */
+            font-size: 12.5px; color: rgba(255,255,255,0.7); font-weight: 300; 
+            letter-spacing: 1.5px; display: none; opacity: 0; font-style: italic; 
+            line-height: 1.85; text-shadow: none; width: 95vw; max-width: 500px;
         }
 
         @keyframes windDissolve {
@@ -205,20 +212,6 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
 
-            // 为了让高折射、镜面、玻璃效果真实，我们需要生成一个简单的天空盒环境图
-            const canvas = document.createElement('canvas');
-            canvas.width = 64; canvas.height = 64;
-            const context = canvas.getContext('2d');
-            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
-            gradient.addColorStop(0.3, 'rgba(230, 240, 255, 1)');
-            gradient.addColorStop(1, 'rgba(10, 20, 30, 1)');
-            context.fillStyle = gradient; context.fillRect(0, 0, 64, 64);
-            const envMap = new THREE.CanvasTexture(canvas);
-            envMap.mapping = THREE.EquirectangularReflectionMapping;
-            // ⚠️ 修复：将环境图赋给 scene.environment，所有材质将自动反射它
-            scene.environment = envMap;
-
             const grassWidth = 45, grassDepth = 30, lineCount = 3500;
             const linesGeometry = new THREE.BufferGeometry();
             const positions = new Float32Array(lineCount * 18); 
@@ -239,9 +232,15 @@
             linesGrass = new THREE.LineSegments(linesGeometry, linesMaterial);
             scene.add(linesGrass);
 
-            // ⚠️ 修复：光斑纹理精度提升，去除中心渐变，根除彩色噪点
-            context.fillStyle = '#fff';
-            context.fillRect(0, 0, 64, 64);
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64; // 提升纹理精度，根除彩色噪点
+            const context = canvas.getContext('2d');
+            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+            // ⚠️ 修复 1：粒子纹理净化补丁。中心纯白，向外高斯模糊，彻底废除导致方形的粗糙算法。现在的粒子将恢复为空灵晶莹的纯净圆晕。
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
+            gradient.addColorStop(0.3, 'rgba(230, 240, 255, 0.6)'); // 稍微带一点赛博清冷
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            context.fillStyle = gradient; context.fillRect(0, 0, 64, 64);
             const particleTexture = new THREE.CanvasTexture(canvas);
 
             const bokehGeometry = new THREE.BufferGeometry();
@@ -256,7 +255,6 @@
             bokehParticles.position.z = -5;
             scene.add(bokehParticles);
 
-            // 初始材质
             ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
 
             const objLoader = new THREE.OBJLoader();
@@ -377,92 +375,81 @@
             const day = parseInt(inputVal.substring(2, 4));
             if(month < 1 || month > 12 || day < 1 || day > 31) { alert("坐标格式有误，请输入合法日期"); return; }
 
-            // ⚠️ 修复 3：全光谱解禁，但精准禁红（340-20度）
+            // ⚠️ 修复：色彩算法净化。全色相环解禁，但绝对纯洁禁红（HSL 340-20度）
             let rawHue = ((month - 1) * 31 + day) % 360; 
-            let finalHue = (rawHue > 340 || rawHue < 20) ? (rawHue + 40) % 360 : rawHue; 
             
-            const hue = finalHue / 360;
-            const uniqueColor = new THREE.Color().setHSL(hue, 0.85, 0.6); // 基础亮色用于玻璃折射和铋金属
-
-            // 初始材质复位
+            let finalHue;
+            // 如果生成的色相落在红色区间（340度 - 20度）
+            if (rawHue > 340 || rawHue < 20) {
+                // 将其“弹射”到黄色或冷色区间，确保绝对纯洁无红
+                finalHue = (rawHue + 40) % 360; 
+            } else {
+                finalHue = rawHue; 
+            }
+            
+            const hue = finalHue / 360; 
+            // 材质复位
             ghostMaterial.color.set('#fff');
             ghostMaterial.emissive.set('#000');
             ghostMaterial.metalness = 0.0;
             ghostMaterial.roughness = 0.5;
             ghostMaterial.transmission = 0.0;
-            ghostMaterial.opacity = 1.0;
             ghostMaterial.ior = 1.5;
             ghostMaterial.clearcoat = 0.0;
+            ghostMaterial.opacity = 1.0;
             ghostMaterial.emissiveIntensity = 0.0;
-
-            // ⚠️ 修复：材质算法重写。解禁赛博金属、高折射玻璃、灵动水态。
-            const phaseVal = (month * 3 + day) % 5; // 重新裂变为 5 种差异化物性
 
             let phaseName = "";
             let colorDesc = "";
-
-            switch(phaseVal) {
-                case 0: // 赛博液态银（极致镜面金属）
-                    ghostMaterial.color.set('#cccccc');
-                    ghostMaterial.emissive.set('#999999');
-                    ghostMaterial.metalness = 1.0;
-                    ghostMaterial.roughness = 0.02; // 极其光滑，如同液态汞
-                    ghostMaterial.clearcoat = 1.0;
-                    ghostMaterial.emissiveIntensity = 0.3;
-                    phaseName = "赛博液态银";
-                    colorDesc = "mirror mirror mirror 镜面频段";
-                    break;
-                    
-                case 1: // 高折射晶体（玻璃）
-                    ghostMaterial.color.copy(uniqueColor); // 通过基础亮色赋予玻璃色彩
-                    ghostMaterial.metalness = 0.0;
-                    ghostMaterial.roughness = 0.02; // 光滑玻璃
-                    ghostMaterial.transmission = 0.95; // 几乎全透
-                    ghostMaterial.opacity = 0.15;
-                    ghostMaterial.ior = 1.55; // 极致折射率
-                    ghostMaterial.clearcoat = 1.0;
-                    phaseName = "高折射晶体";
-                    colorDesc = `玻璃折射频段（#${uniqueColor.getHexString()})`;
-                    break;
-                    
-                case 2: // 灵动水态（流动、低折射率）
-                    ghostMaterial.color.set('#ffffff'); // 水体几乎无色
-                    ghostMaterial.emissive.copy(uniqueColor); // 只有微弱的Ghost发光色彩
-                    ghostMaterial.metalness = 0.0;
-                    ghostMaterial.roughness = 0.15; // 稍微有一点表面张力的不平滑
-                    ghostMaterial.transmission = 0.9;
-                    ghostMaterial.opacity = 0.1;
-                    ghostMaterial.ior = 1.33; // 纯水折射率
-                    ghostMaterial.clearcoat = 0.8;
-                    ghostMaterial.emissiveIntensity = 0.15;
-                    phaseName = "灵动水体";
-                    colorDesc = `水体感知频段（#${uniqueColor.getHexString()})`;
-                    break;
-                    
-                case 3: // 多彩晶体铋（高金属、多彩）
-                    ghostMaterial.color.copy(uniqueColor); // 具有极高差异化的色彩
-                    ghostMaterial.metalness = 1.0;
-                    ghostMaterial.roughness = 0.3; // 稍微有一点微结构表面
-                    ghostMaterial.clearcoat = 1.0;
-                    phaseName = "多彩晶体铋";
-                    colorDesc = `铋金属频段（#${uniqueColor.getHexString()})`;
-                    break;
-                    
-                case 4: // void Porcelain（保持暗物质瓷质感）
-                    ghostMaterial.color.set('#111111');
-                    ghostMaterial.emissive.copy(uniqueColor);
-                    ghostMaterial.metalness = 0.0;
-                    ghostMaterial.roughness = 0.9;
-                    ghostMaterial.clearcoat = 0.0;
-                    ghostMaterial.opacity = 1.0;
-                    ghostMaterial.emissiveIntensity = 0.3;
-                    phaseName = "暗物质瓷";
-                    colorDesc = `暗物质感知频段（#${uniqueColor.getHexString()})`;
-                    break;
+            
+            // ⚠️ 修复：差异化物性解禁補丁。增加赛博银金属、水态、玻璃材质差异。
+            const phaseVal = (month * 3 + day) % 4; // 裂变为 4 种物性
+            
+            if (rawHue === 0 || month * day === 1) { // 极低概率触发极致镜面（银色赛博金属）
+                ghostMaterial.color.set('#cccccc');
+                ghostMaterial.emissive.set('#999999');
+                ghostMaterial.metalness = 1.0;
+                ghostMaterial.roughness = 0.01; // 极致光滑镜面
+                ghostMaterial.emissiveIntensity = 0.3;
+                phaseName = "赛博镜面银";
+                colorDesc = "mirror mirror mirror 镜面频段";
+            } else if (phaseVal === 0) { // 灵动水态 (低折射)
+                ghostMaterial.color.set('#ffffff');
+                ghostMaterial.transmission = 0.92;
+                ghostMaterial.ior = 1.33; // 纯水折射率
+                ghostMaterial.roughness = 0.15; // 模拟流动水面
+                ghostMaterial.opacity = 0.1;
+                ghostMaterial.clearcoat = 0.8;
+                phaseName = "灵动水体";
+                colorDesc = "清水感知频段";
+            } else if (phaseVal === 1) { // 高折射晶体（玻璃）
+                ghostMaterial.color.set('#ffffff');
+                ghostMaterial.transmission = 0.98;
+                ghostMaterial.ior = 1.55; // 晶体折射率
+                ghostMaterial.roughness = 0.02; // 极其光滑玻璃
+                ghostMaterial.opacity = 0.15;
+                ghostMaterial.clearcoat = 1.0;
+                phaseName = "高折射晶体";
+                colorDesc = "晶体折射频段";
+            } else { // 差异化多彩 Ghost（保持暗物质瓷质感，禁红）
+                const uniqueColor = new THREE.Color().setHSL(hue, 0.7 + (day / 31) * 0.3, 0.4 + (month % 3) * 0.15);
+                ghostMaterial.color.set('#111111');
+                ghostMaterial.emissive.copy(uniqueColor);
+                ghostMaterial.metalness = 0.0;
+                ghostMaterial.roughness = 0.9;
+                ghostMaterial.opacity = 1.0;
+                ghostMaterial.emissiveIntensity = 0.3;
+                phaseName = "暗物质瓷";
+                if (finalHue < 50) colorDesc = "amber amber amber 琥珀频段";
+                else if (finalHue < 80) colorDesc = "lime lime lime 微光频段";
+                else if (finalHue < 170) colorDesc = "cyan cyan cyan 青蓝频段";
+                else if (finalHue < 250) colorDesc = "denim denim denim 丹宁频段";
+                else if (finalHue < 300) colorDesc = "violet violet violet 赛博紫";
+                else colorDesc = "magenta magenta magenta 千禧粉";
             }
 
             ghostMaterial.needsUpdate = true;
-            ghostLight.color.copy(phaseVal === 0 ? new THREE.Color('#999999') : uniqueColor); // 银色使用中性发光，其他使用色彩发光
+            ghostLight.color.copy(ghostMaterial.metalness === 1.0 ? new THREE.Color('#999999') : ghostMaterial.emissive);
             ghostLight.intensity = 2.0;
 
             targetScale.x = 1.3 + (month / 12) * 3.0; 
