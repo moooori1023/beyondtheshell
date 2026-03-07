@@ -11,50 +11,70 @@
             font-family: 'PingFang SC', 'Helvetica Neue', 'Hiragino Sans GB', sans-serif; color: #fff; 
             touch-action: none;
         }
+        
         #bg-image {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: url('bg.jpg'); 
             background-size: cover; background-position: center bottom;
             z-index: 0; 
         }
+
         canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
+
         #glass-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(10, 15, 20, 0.45); 
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             z-index: 5; transition: opacity 2.5s ease; pointer-events: none;
         }
+
         #ui-layer {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 10; transition: opacity 1.5s ease;
         }
+
         #intro-box { text-align: center; width: 90%; max-width: 520px; margin-bottom: 40px; }
         #intro-box h1 { font-size: clamp(16px, 4vw, 20px); font-weight: 400; letter-spacing: 5px; margin-bottom: 15px; }
         .en-title { display: block; font-size: 10px; font-family: monospace; letter-spacing: 8px; color: rgba(255,255,255,0.5); margin-top: 8px; }
-        #intro-box p { font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; letter-spacing: 2px; color: rgba(255,255,255,0.8); }
+        #intro-box p { font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; letter-spacing: 2px; color: rgba(255,255,255,0.85); }
+
         .btn-style { 
             background: rgba(255, 255, 255, 0.9); color: #000; border: none; padding: 12px 40px; border-radius: 30px; 
             cursor: pointer; font-size: 13px; letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease;
         }
+        
         #birthday-ui { display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; }
         #bday-input {
             background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.6);
             color: #fff; font-size: 35px; text-align: center; width: 180px; letter-spacing: 12px; outline: none; margin-bottom: 35px;
         }
+
         #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
+
         #ghost-info {
             position: fixed; bottom: 5vh; left: 50%; transform: translateX(-50%);
             color: rgba(255,255,255,0.9); text-align: center; opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none; width: 95vw;
         }
         .ghost-header { font-size: 10px; color: #fff; margin-bottom: 15px; font-family: monospace; letter-spacing: 2px; white-space: nowrap; }
-        #ghost-oracle { font-size: 13px; color: #eee; font-weight: 300; letter-spacing: 1.5px; line-height: 2.2; white-space: nowrap; }
+        
+        /* 判词排版：通过 nowrap 强制整体，依赖唯一的 <br> 换行 */
+        #ghost-oracle {
+            font-size: clamp(9.5px, 2.6vw, 13px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; 
+            line-height: 2.2; white-space: nowrap;
+        }
+
         #ghost-quote {
             font-size: 12px; color: #ffffff; font-weight: 400; letter-spacing: 1.5px; display: none; opacity: 0; font-style: italic; line-height: 2.0;
             pointer-events: auto; cursor: pointer;
         }
-        @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0); } 100% { opacity: 0; filter: blur(12px); transform: translate3d(20px, -10px, 0); } }
+        
+        @keyframes windDissolve { 
+            0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0); } 
+            100% { opacity: 0; filter: blur(12px); transform: translate3d(20px, -10px, 0); } 
+        }
         .dissolve-anim { animation: windDissolve 2.5s forwards; }
+        
         @keyframes fadeInQuote { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in-anim { animation: fadeInQuote 2.5s ease forwards; }
     </style>
@@ -63,6 +83,7 @@
     <div id="fade-in-overlay"></div>
     <div id="bg-image"></div>
     <div id="glass-overlay"></div>
+    
     <div id="ui-layer">
         <div id="intro-box">
             <h1>躯壳之外<span class="en-title">BEYOND THE SHELL</span></h1>
@@ -74,6 +95,7 @@
             <button class="btn-style" onclick="awakenGhost()">唤醒 Ghost</button>
         </div>
     </div>
+
     <div id="ghost-info">
         <div id="oracle-group">
             <div class="ghost-header" id="ghost-coord"></div>
@@ -89,7 +111,7 @@
     <script src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script>
         window.onload = () => { document.getElementById('fade-in-overlay').style.opacity = '0'; }
-        let scene, camera, renderer, linesGrass, metalFlower, bokehParticles;
+        let scene, camera, renderer, metalFlower, bokehParticles;
         const mouse = new THREE.Vector2();
         let gardenActive = false, isAwakening = false;
         let ghostMaterial, ghostLight, animTimer1, animTimer2;
@@ -97,16 +119,13 @@
 
         function generateOracle(month, day) {
             const bases = [
-                "如寒冬尽头的破土之芽，带着季风的清冽", "像深海沉寂的琥珀，封存了远古的星晖", "如游走在云端的孤独波段，不染尘埃", 
-                "似月色下的潮汐起伏，温柔中带有坚韧", "如山巅终年不化的积雪，冷峻而纯粹", "像荒原上唯一的植株，沉默地确立坐标"
-            ];
-            const spirits = [
-                "静默地注视着时间的纹理", "轻盈地穿过喧嚣的数字洪流", "在宿命的枷锁中寻找回声", "温柔地解析着万物的震荡", 
-                "独自重塑着被同化的法则", "捕捉着空气中微弱的共鸣", "冷眼观望着逻辑背后的深海"
+                "如季风拂过苔藓，带着潮湿的生机", "像结晶于深海的琥珀，封存着远古星晖", "如游走在云端的电波，不沾染半分尘埃", 
+                "似月色下的无声潮汐，在克制中蕴含汹涌", "如万物封冻前的最后一抹余温，冷峻而慈悲", "像孤独盘旋的星轨，在虚无中确立唯一坐标"
             ];
             const hashA = (month * 13 + day * 7) % bases.length;
-            const hashB = (month * 17 + day * 3) % spirits.length;
-            return `你的 Ghost ${bases[hashA]}。<br>${spirits[hashB]}。`;
+            
+            // 还原那句“物理世界刻度”的灵魂判词
+            return `你的 Ghost ${bases[hashA]}。<br>这串物理世界的初始时间戳，是通往躯壳之外的唯一密钥。`;
         }
 
         function init3D() {
@@ -118,6 +137,7 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
 
+            // 粒子系统：散焦纵深感
             const canvas = document.createElement('canvas');
             canvas.width = 64; canvas.height = 64;
             const ctx = canvas.getContext('2d');
@@ -132,10 +152,13 @@
             for(let i = 0; i < 140; i++) { 
                 bokehPos[i*3] = (Math.random() - 0.5) * 35; 
                 bokehPos[i*3+1] = (Math.random() - 0.5) * 35; 
-                bokehPos[i*3+2] = Math.random() * 18 - 15; 
+                bokehPos[i*3+2] = Math.random() * 18 - 15; // Z轴纵深
             }
             bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPos, 3));
-            const bokehMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.35, transparent: true, opacity: 0.8, map: particleTexture, depthTest: false, blending: THREE.AdditiveBlending });
+            const bokehMat = new THREE.PointsMaterial({ 
+                color: 0xffffff, size: 0.35, transparent: true, opacity: 0.8, 
+                map: particleTexture, depthTest: false, blending: THREE.AdditiveBlending, sizeAttenuation: true 
+            });
             bokehParticles = new THREE.Points(bokehGeometry, bokehMat);
             scene.add(bokehParticles);
 
@@ -163,7 +186,7 @@
         function animate() {
             requestAnimationFrame(animate);
             const time = performance.now() * 0.001;
-            if(bokehParticles) bokehParticles.rotation.y = time * 0.03;
+            if(bokehParticles) bokehParticles.rotation.y = time * 0.02;
             if(metalFlower && metalFlower.visible) {
                 if(isAwakening) {
                     currentScale.x += (targetScale.x - currentScale.x) * 0.05;
@@ -197,7 +220,7 @@
                     document.getElementById('ghost-quote').style.display = 'block';
                     document.getElementById('ghost-quote').classList.add('fade-in-anim');
                 }, 2500);
-            }, 15000);
+            }, 15000); // 停留15秒
         }
 
         function restoreOracle() {
@@ -212,7 +235,6 @@
             if(val.length !== 4) return;
             const m = parseInt(val.substring(0, 2)), d = parseInt(val.substring(2, 4));
             
-            // ⚠️ 物理参数重构：解决死白，引入深度色彩
             ghostMaterial.color.set('#fff');
             ghostMaterial.emissive.set('#000');
             ghostMaterial.transmission = 0;
@@ -225,24 +247,24 @@
                 ghostMaterial.color.set('#111');
                 ghostMaterial.emissive.copy(c);
                 ghostMaterial.roughness = 0.9;
-                ghostLight.color.copy(c); ghostLight.intensity = 2;
-                document.getElementById('ghost-coord').innerHTML = `[ 坐标：0203 | 相态：暗物质瓷 | 色谱：深邃丹宁 ]`;
+                ghostLight.color.copy(c); ghostLight.intensity = 2.0;
+                document.getElementById('ghost-coord').innerHTML = `[ 坐标：0203 | 相态：暗物质瓷 ]`;
             } else {
-                const hue = ((m * 31 + d) % 360) / 360;
+                let hue = ((m * 31 + d) % 360) / 360;
                 const c = new THREE.Color().setHSL(hue, 0.4, 0.5);
                 const phase = (m + d) % 3;
-                if(phase === 0) { // 琉璃：不再死白
-                    ghostMaterial.color.copy(c).multiplyScalar(0.2); // 压低底色
+                if(phase === 0) { // 高折射晶体：防过曝处理
+                    ghostMaterial.color.copy(c).multiplyScalar(0.15); 
                     ghostMaterial.transmission = 1;
                     ghostMaterial.thickness = 2;
-                    ghostMaterial.ior = 1.5;
-                    ghostMaterial.roughness = 0.05;
-                    ghostMaterial.attenuationColor = c; // 引入吸收色
-                    ghostMaterial.attenuationDistance = 0.5;
-                    ghostLight.intensity = 0.3;
+                    ghostMaterial.ior = 1.55;
+                    ghostMaterial.roughness = 0.02;
+                    ghostMaterial.attenuationColor = c; // 色散核心
+                    ghostMaterial.attenuationDistance = 0.6;
+                    ghostLight.intensity = 0.4;
                     document.getElementById('ghost-coord').innerHTML = `[ 坐标：${val} | 相态：高折射琉璃 ]`;
-                } else if(phase === 1) { // 镜面
-                    ghostMaterial.metalness = 1; ghostMaterial.roughness = 0.1;
+                } else if(phase === 1) { 
+                    ghostMaterial.metalness = 1; ghostMaterial.roughness = 0.05;
                     ghostMaterial.color.copy(c);
                     ghostLight.intensity = 1.5;
                     document.getElementById('ghost-coord').innerHTML = `[ 坐标：${val} | 相态：液态金属 ]`;
