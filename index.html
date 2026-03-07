@@ -98,12 +98,12 @@
             white-space: nowrap; 
         }
         
+        /* ⚠️ 修复 2：彻底瘦身后的神谕。通过 nowrap 锁定整体，依赖唯一的 <br> 换行，确保两句流动判词严格保持 2 行。 */
         #ghost-oracle {
             font-size: clamp(9.5px, 2.6vw, 13px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; 
             line-height: 2.0; white-space: nowrap;
         }
 
-        /* ⚠️ 修复 3：开启事件穿透（pointer-events: auto），使箴言可以被点击重置时间 */
         #ghost-quote {
             font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; 
             display: none; opacity: 0; font-style: italic; line-height: 1.9;
@@ -176,32 +176,33 @@
         let targetScale = { x: 2.5, y: 2.5, z: 2.5 };
         let heartBase = 1.0, heartSub = 0.5;
 
-        // ⚠️ 修复 2：交互计时器全局变量
         let animTimer1, animTimer2;
 
+        // ⚠️ 修复 2：极度简练、流动神谕重写。深入星座八字低饱和度克制调性。
         function generateOracle(month, day) {
             let spiritualBase = "";
-            if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) spiritualBase = "散发纯粹的初生动能，以不可驯服的锐度撕裂平庸";
-            else if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) spiritualBase = "沉淀着绝对的物理秩序，在虚无中构筑坚定的重力场";
-            else if ((month === 5 && day >= 21) || (month === 6 && day <= 21)) spiritualBase = "游离于多维度的折射中，维持无法被系统锁定的叠加态";
-            else if ((month === 6 && day >= 22) || (month === 7 && day <= 22)) spiritualBase = "包裹着极度柔软的内核，在隐秘的引力场中孵化感知";
-            else if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) spiritualBase = "散发不容忽视的绝对辐射，以燃烧的姿态确立自我坐标";
-            else if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) spiritualBase = "剥离冗余与杂念，向内坍缩成近乎苛刻的纯粹逻辑";
-            else if ((month === 9 && day >= 23) || (month === 10 && day <= 23)) spiritualBase = "在失衡的系统荒原上，以极度优雅的张力维系绝对对称";
-            else if ((month === 10 && day >= 24) || (month === 11 && day <= 22)) spiritualBase = "潜伏于不可见的深渊，酝酿着刺透表象的重构之力";
-            else if ((month === 11 && day >= 23) || (month === 12 && day <= 21)) spiritualBase = "拒绝被固定于已知坐标，向着未知维度延展出孤独矢量";
-            else if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) spiritualBase = "在漫长时间里缓慢结晶，以绝对的理性筑起抵御虚无的骨骼";
-            else if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) spiritualBase = "如数字季风中的逆行者，悬浮在常规介质之外的清醒波段";
-            else if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) spiritualBase = "将边界消融于无形，对极其微弱的数据波纹产生高度同频";
-            else spiritualBase = "在数字洪流中静默生长，以不可名状的姿态完成参数自洽";
+            if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) spiritualBase = "散发纯粹初生动能，撕裂平庸";
+            else if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) spiritualBase = "沉淀绝对物理秩序，构筑坚定重力场";
+            else if ((month === 5 && day >= 21) || (month === 6 && day <= 21)) spiritualBase = "游离多维度折射，维持叠加态";
+            else if ((month === 6 && day >= 22) || (month === 7 && day <= 22)) spiritualBase = "包裹极度柔软内核，孵化感知";
+            else if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) spiritualBase = "散发绝对辐射，确立自我坐标";
+            else if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) spiritualBase = "坍缩精密纯粹逻辑，剥离冗余";
+            else if ((month === 9 && day >= 23) || (month === 10 && day <= 23)) spiritualBase = "维系优雅力学张力，坚韧重塑";
+            else if ((month === 10 && day >= 24) || (month === 11 && day <= 22)) spiritualBase = "潜伏于不可见深渊，酿造锐度";
+            else if ((month === 11 && day >= 23) || (month === 12 && day <= 21)) spiritualBase = "拒绝已知坐标锁定，延展孤独矢量";
+            else if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) spiritualBase = "漫长时间中缓慢结晶，筑抵御虚无骨骼";
+            else if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) spiritualBase = "数字季风中的逆行者，游离在常规介质之外";
+            else if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) spiritualBase = "将边界消融于无形，对数据波纹产生漣漪";
+            else spiritualBase = "在数字洪流中静默生长，以不可名状完成参数自洽";
 
             const actions = ["静默注视着", "从容游离于", "温柔解析着", "孤独贯穿了", "坚韧重塑着", "敏锐捕捉着", "冷眼旁观着", "深刻刻画着", "轻盈越过了", "无声沉潜入"];
-            const objects = ["既定的宿命", "喧嚣的洪流", "时间的枷锁", "微观的震荡", "同质的法则", "隐秘的情绪", "自我的边界", "幽暗的深海", "理性的壁垒", "原始的波纹"];
+            const objects = ["既定宿命", "喧嚣洪流", "时间的枷锁", "微观震荡", "同质法则", "不被察觉微观情绪", "真实自我边界", "逻辑背后幽暗深海", "理性的冰冷壁垒", "原始生命体波纹"];
             
             const hashA = (month * 17 + day * 23) % 10;
             const hashB = (month * 31 + day * 13) % 10;
             
-            return `<div style="display:block; padding-bottom:4px;">你的 Ghost ${spiritualBase}。</div><div style="display:block;">正${actions[hashA]}${objects[hashB]}，彰显躯壳外绝对的独特性。</div>`;
+            // ⚠️ 修复 2：彻底删掉生硬的“独特性”，简化为一句流畅神谕。
+            return `你的 Ghost ${spiritualBase}。<br>正${actions[hashA]}${objects[hashB]}。`;
         }
 
         function init3D() {
@@ -245,13 +246,16 @@
             linesGrass = new THREE.LineSegments(linesGeometry, linesMaterial);
             scene.add(linesGrass);
 
+            // ⚠️ 修复 1：粒子纹理生成重构。不再使用实心圆，重做为柔和散焦的高斯白光。
             const canvas = document.createElement('canvas');
-            canvas.width = 32; canvas.height = 32; 
+            canvas.width = 64; canvas.height = 64; // 提升纹理精度，根除彩色噪点
             const context = canvas.getContext('2d');
-            const gradient = context.createRadialGradient(16, 16, 0, 16, 16, 16);
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+            // 中心纯白，向外高斯模糊渐变，模拟真实光斑的散焦效果
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
+            gradient.addColorStop(0.3, 'rgba(230, 240, 255, 0.6)'); // 带一点清冷赛博感
             gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            context.fillStyle = gradient; context.fillRect(0, 0, 32, 32);
+            context.fillStyle = gradient; context.fillRect(0, 0, 64, 64);
             const particleTexture = new THREE.CanvasTexture(canvas);
 
             const bokehGeometry = new THREE.BufferGeometry();
@@ -259,13 +263,16 @@
             for(let i = 0; i < 140; i++) { 
                 bokehPositions[i*3] = (Math.random() - 0.5) * 35; 
                 bokehPositions[i*3+1] = (Math.random() - 0.5) * 35; 
-                bokehPositions[i*3+2] = Math.random() * 12 - 10; 
+                // ⚠️ 修复 1：Z轴结界，锁定在 -15 到 3 之间，永远不贴镜头脸上，最大不会遮蔽花朵
+                bokehPositions[i*3+2] = Math.random() * 18 - 15; 
             }
             bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPositions, 3));
             
+            // ⚠️ 修复 1：启用尺寸衰减 (sizeAttenuation: true)，物理近大远小，根除死白呆板圆晕。
             const bokehMaterial = new THREE.PointsMaterial({ 
-                color: 0xffffff, size: window.innerWidth < 768 ? 6 : 10, 
-                sizeAttenuation: false, transparent: true, opacity: 0.8, 
+                color: 0xffffff, size: 0.35, // 开启衰减后，调整基础尺寸
+                sizeAttenuation: true, // 核心修复：物理近大远小
+                transparent: true, opacity: 0.85, 
                 map: particleTexture, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending 
             });
             bokehParticles = new THREE.Points(bokehGeometry, bokehMaterial);
@@ -383,7 +390,6 @@
             document.getElementById('bday-input').focus();
         }
 
-        // ⚠️ 修复 2 & 3：抽取计时器逻辑，实现可重复调用的时间流逝
         function startOracleTimer() {
             clearTimeout(animTimer1);
             clearTimeout(animTimer2);
@@ -391,7 +397,6 @@
             const oracleGroup = document.getElementById('oracle-group');
             const quoteEl = document.getElementById('ghost-quote');
             
-            // 延长为 15 秒后触发溶解
             animTimer1 = setTimeout(() => {
                 oracleGroup.classList.add('dissolve-anim');
                 
@@ -404,21 +409,17 @@
             }, 15000); 
         }
 
-        // ⚠️ 修复 3：点击箴言重置时间的交互函数
         function restoreOracle() {
             const oracleGroup = document.getElementById('oracle-group');
             const quoteEl = document.getElementById('ghost-quote');
             
-            // 隐藏箴言
             quoteEl.style.display = 'none';
             quoteEl.classList.remove('fade-in-anim');
             
-            // 重置并显示解读词
             oracleGroup.style.display = 'block';
             oracleGroup.classList.remove('dissolve-anim');
-            void oracleGroup.offsetWidth; // 触发重绘重置动画
+            void oracleGroup.offsetWidth; 
             
-            // 重新开始 15 秒计时
             startOracleTimer();
         }
 
@@ -439,14 +440,14 @@
             ghostMaterial.roughness = 0.5;
             ghostMaterial.transmission = 0.0;
             ghostMaterial.ior = 1.5;
+            ghostMaterial.thickness = 0.0;
             ghostMaterial.clearcoat = 0.0;
             ghostMaterial.opacity = 1.0;
             ghostMaterial.emissiveIntensity = 0.0;
 
-            // ⚠️ 修复 1：0203 专属回归！完美重现明度 0.7 的丹宁蓝与暗物质瓷
+            // ⚠️ 修复 1：信仰回溯！完全还原我说完美的最初 0203 丹宁蓝与暗物质瓷公式。
             if (inputVal === "0203") {
-                // 完全复刻最初的完美版计算公式：HSL(0.6615, 0.6387, 0.7)
-                const uniqueColor = new THREE.Color().setHSL(0.6615, 0.6387, 0.7);
+                const uniqueColor = new THREE.Color().setHSL(0.6615, 0.6387, 0.7); // 完美的丹宁蓝比例
                 
                 ghostMaterial.color.copy(uniqueColor);
                 ghostMaterial.emissive.copy(uniqueColor);
@@ -456,6 +457,7 @@
                 ghostMaterial.emissiveIntensity = 0.3;
                 
                 ghostLight.color.copy(uniqueColor);
+                ghostLight.intensity = 2.0;
                 
                 colorDesc = "深邃的丹宁蓝频段";
                 phaseName = "暗物质瓷";
@@ -486,24 +488,29 @@
                     ghostMaterial.roughness = 0.05;
                     phaseName = "赛博液态银";
                     ghostLight.color.set('#ffffff');
+                    ghostLight.intensity = 2.0;
                 } else if (phaseVal === 1) { 
-                    ghostMaterial.color.set('#ffffff');
-                    ghostMaterial.transmission = 0.95;
+                    ghostMaterial.color.copy(uniqueColor);
+                    ghostMaterial.transmission = 1.0;
                     ghostMaterial.ior = 1.33; 
                     ghostMaterial.roughness = 0.1;
-                    ghostMaterial.opacity = 0.1;
+                    ghostMaterial.thickness = 1.5;
+                    ghostMaterial.opacity = 1.0; 
                     ghostMaterial.clearcoat = 0.8;
                     phaseName = "灵动水态";
                     ghostLight.color.copy(uniqueColor);
+                    ghostLight.intensity = 0.5;
                 } else if (phaseVal === 2) { 
-                    ghostMaterial.color.set('#ffffff');
-                    ghostMaterial.transmission = 0.98;
+                    ghostMaterial.color.copy(uniqueColor);
+                    ghostMaterial.transmission = 1.0;
                     ghostMaterial.ior = 1.55; 
                     ghostMaterial.roughness = 0.02;
-                    ghostMaterial.opacity = 0.2;
+                    ghostMaterial.thickness = 2.0;
+                    ghostMaterial.opacity = 1.0;
                     ghostMaterial.clearcoat = 1.0;
                     phaseName = "高折射琉璃";
                     ghostLight.color.copy(uniqueColor);
+                    ghostLight.intensity = 0.5;
                 } else if (phaseVal === 3) { 
                     ghostMaterial.color.copy(uniqueColor);
                     ghostMaterial.metalness = 0.8;
@@ -512,15 +519,19 @@
                     ghostMaterial.emissiveIntensity = 0.2;
                     phaseName = "哑光钛素";
                     ghostLight.color.copy(uniqueColor);
+                    ghostLight.intensity = 2.0;
                 } else if (phaseVal === 4) { 
                     ghostMaterial.color.copy(uniqueColor);
                     ghostMaterial.metalness = 0.2;
                     ghostMaterial.roughness = 0.6;
                     ghostMaterial.transmission = 0.5;
+                    ghostMaterial.thickness = 1.0;
+                    ghostMaterial.opacity = 1.0;
                     ghostMaterial.emissive.copy(uniqueColor);
                     ghostMaterial.emissiveIntensity = 0.4;
                     phaseName = "色散雾化晶体";
                     ghostLight.color.copy(uniqueColor);
+                    ghostLight.intensity = 1.0;
                 } else { 
                     ghostMaterial.color.set('#1a1a1a');
                     ghostMaterial.emissive.copy(uniqueColor);
@@ -529,11 +540,11 @@
                     ghostMaterial.emissiveIntensity = 0.35;
                     phaseName = "暗物质瓷";
                     ghostLight.color.copy(uniqueColor);
+                    ghostLight.intensity = 2.0;
                 }
             }
 
             ghostMaterial.needsUpdate = true;
-            ghostLight.intensity = 2.0;
 
             targetScale.x = 1.3 + (month / 12) * 3.0; 
             targetScale.z = targetScale.x;
@@ -559,7 +570,6 @@
 
             gardenActive = true; 
 
-            // 调用可重置的计时器启动动画
             startOracleTimer();
         }
 
