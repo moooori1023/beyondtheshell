@@ -81,32 +81,37 @@
 
         #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
 
+        /* 档案区容器宽度放宽，防止强制不换行时超出屏幕边距 */
         #ghost-info {
             position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%);
             color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8;
             opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none;
-            width: 90%; max-width: 750px;
+            width: 95vw; max-width: 750px;
         }
         
         #oracle-group {
             will-change: transform, opacity, filter, letter-spacing;
         }
 
-        /* ⚠️ 修复 3：无阴影提纯，颜色提至纯白，字重微增，确保高对比度清晰 */
+        /* ⚠️ 问题 2 修复：增加 white-space: nowrap; 强制坐标在一行内完整显示 */
         .ghost-header {
-            font-size: clamp(10px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); 
-            font-family: monospace; letter-spacing: 3px; font-weight: 400; 
+            font-size: clamp(8px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); 
+            font-family: monospace; letter-spacing: 2px; font-weight: 400; 
+            white-space: nowrap; 
         }
         
-        /* ⚠️ 修复 1 & 4：解除截断，自然舒展，通过 clamp 控制在手机端不超过 3 行 */
+        /* ⚠️ 问题 3 修复：增加 nowrap，强制只在代码的 <br> 处换行，严丝合缝保证完整两行 */
         #ghost-oracle {
-            font-size: clamp(11px, 2.8vw, 13.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; 
-            line-height: 1.8;
+            font-size: clamp(9px, 2.6vw, 13.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; 
+            line-height: 2.0;
+            white-space: nowrap; 
         }
 
+        /* ⚠️ 问题 4 修复：颜色提亮至纯白，字重微粗，强制两行完整显示 */
         #ghost-quote {
-            font-size: clamp(11px, 2.8vw, 13.5px); color: #bbb; font-weight: 300; letter-spacing: 1.5px; 
+            font-size: clamp(9.5px, 2.6vw, 13.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.5px; 
             display: none; opacity: 0; font-style: italic; line-height: 2.0;
+            white-space: nowrap; 
         }
 
         @keyframes windDissolve {
@@ -171,7 +176,7 @@
         let targetScale = { x: 2.5, y: 2.5, z: 2.5 };
         let heartBase = 1.0, heartSub = 0.5;
 
-        // 恢复完美版的 12 种底层灵魂描述词库
+        // 保持完美版的 12 种底层灵魂描述词库不变
         function generateOracle(month, day) {
             let spiritualBase = "";
             if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) spiritualBase = "散发着不可驯服的初生动能，以一种原始而纯粹的锐度撕裂平庸";
@@ -194,7 +199,8 @@
             const hashA = (month * 17 + day * 23) % 10;
             const hashB = (month * 31 + day * 13) % 10;
             
-            return `你的 Ghost ${spiritualBase}。正${actions[hashA]}${objects[hashB]}，呈现出躯壳之外绝对的精神独特性。`;
+            // 代码中固有的 <br> 会配合 CSS 的 nowrap 确保精准分成两行
+            return `你的 Ghost ${spiritualBase}。<br>正${actions[hashA]}${objects[hashB]}，呈现出躯壳之外绝对的精神独特性。`;
         }
 
         function init3D() {
@@ -227,13 +233,12 @@
             linesGrass = new THREE.LineSegments(linesGeometry, linesMaterial);
             scene.add(linesGrass);
 
-            // ⚠️ 修复 2：画布翻倍至 64x64，纯白中心向外平滑模糊渐变，彻底解决方形/彩色噪点
+            // ⚠️ 问题 1 修复：剥离一切杂色，创造绝对纯白透明的渐变图章，根除彩色噪点
             const canvas = document.createElement('canvas');
             canvas.width = 64; canvas.height = 64;
             const context = canvas.getContext('2d');
             const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
             gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
             gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
             context.fillStyle = gradient; context.fillRect(0, 0, 64, 64);
             const particleTexture = new THREE.CanvasTexture(canvas);
@@ -242,8 +247,10 @@
             const bokehPositions = new Float32Array(140 * 3);
             for(let i = 0; i < 140 * 3; i++) { bokehPositions[i] = (Math.random() - 0.5) * 35; }
             bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPositions, 3));
+            
+            // ⚠️ 问题 1 修复：材质强制锁定纯白 0xffffff，防止任何色彩通道干涉
             const bokehMaterial = new THREE.PointsMaterial({ 
-                color: 0xffeebb, size: 0.35, transparent: true, opacity: 0.85, 
+                color: 0xffffff, size: 0.35, transparent: true, opacity: 0.85, 
                 map: particleTexture, depthWrite: false, blending: THREE.AdditiveBlending 
             });
             bokehParticles = new THREE.Points(bokehGeometry, bokehMaterial);
@@ -373,7 +380,7 @@
             const day = parseInt(inputVal.substring(2, 4));
             if(month < 1 || month > 12 || day < 1 || day > 31) { alert("坐标格式有误，请输入合法日期"); return; }
 
-            // 恢复完美版的经典 4 色系算法
+            // 保持完美版的经典 4 色系算法不变
             const hashColor = (month * 13 + day * 7) % 100; 
             const hue = 0.45 + (hashColor / 100) * 0.45; 
             const saturation = 0.6 + (day / 31) * 0.4; 
@@ -391,7 +398,7 @@
             else if (hue < 0.85) colorDesc = "异质的赛博紫频段";
             else colorDesc = "低保真的千禧淡粉频段";
 
-            // 恢复完美版的经典 3 相态算法
+            // 保持完美版的经典 3 相态算法不变
             const phaseVal = (month * 7 + day * 11) % 3;
             let phaseName = "";
             if (phaseVal === 0) {
