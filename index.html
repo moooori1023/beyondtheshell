@@ -11,43 +11,117 @@
             font-family: 'PingFang SC', 'Helvetica Neue', 'Hiragino Sans GB', sans-serif; color: #fff; 
             touch-action: none;
         }
+        
         #bg-image {
             position: fixed; top: 0; left: 0; width: 100vw; height: 110vh;
             background-image: url('bg.jpg'); 
             background-size: cover; background-position: center bottom;
-            z-index: 0; 
+            z-index: 0;
         }
-        canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
+
+        canvas { 
+            display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            z-index: 1; pointer-events: none;
+        }
+
         #glass-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0); backdrop-filter: none; -webkit-backdrop-filter: none;
+            background: rgba(0, 0, 0, 0); 
+            backdrop-filter: none; 
+            -webkit-backdrop-filter: none;
             z-index: 5; transition: opacity 2.5s ease; pointer-events: none;
         }
+
         #ui-layer {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(0, 0, 0, 0.30); z-index: 10; transition: opacity 1.5s ease;
+            background: rgba(0, 0, 0, 0.30);
+            z-index: 10; transition: opacity 1.5s ease;
         }
-        #intro-box { text-align: center; width: 90%; max-width: 520px; padding: 0; margin-bottom: clamp(20px, 5vh, 40px); }
-        #intro-box h1 { font-size: clamp(16px, 4vw, 20px); font-weight: 400; letter-spacing: 5px; margin-bottom: 15px; color: #fff; line-height: 1.4; }
-        .en-title { display: block; font-size: clamp(9px, 2vw, 11px); font-family: monospace; letter-spacing: 8px; color: rgba(255,255,255,0.5); margin-top: 8px; font-weight: 300; }
-        #intro-box p { font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; letter-spacing: 2px; color: rgba(255,255,255,0.85); }
-        .btn-style { background: rgba(255, 255, 255, 0.9); color: #000; border: none; padding: clamp(10px, 2vh, 12px) clamp(30px, 6vw, 40px); border-radius: 30px; cursor: pointer; font-size: clamp(11px, 2.5vw, 13px); letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease; pointer-events: auto; }
+
+        #intro-box {
+            text-align: center; width: 90%; max-width: 520px; padding: 0;
+            margin-bottom: clamp(20px, 5vh, 40px);
+        }
+        #intro-box h1 {
+            font-size: clamp(16px, 4vw, 20px); font-weight: 400; letter-spacing: 5px; 
+            margin-bottom: 15px; color: #fff; line-height: 1.4;
+        }
+        .en-title {
+            display: block; font-size: clamp(9px, 2vw, 11px); font-family: monospace; 
+            letter-spacing: 8px; color: rgba(255,255,255,0.5); margin-top: 8px; font-weight: 300;
+        }
+        #intro-box p {
+            font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; 
+            letter-spacing: 2px; color: rgba(255,255,255,0.85);
+        }
+
+        .btn-style { 
+            background: rgba(255, 255, 255, 0.9); color: #000; border: none; 
+            padding: clamp(10px, 2vh, 12px) clamp(30px, 6vw, 40px); border-radius: 30px; 
+            cursor: pointer; font-size: clamp(11px, 2.5vw, 13px); letter-spacing: 2px; font-weight: 600; 
+            transition: all 0.4s ease; pointer-events: auto;
+        }
         .btn-style:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.3); }
-        #birthday-ui { display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; pointer-events: auto; text-align: center; }
-        #bday-input { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.6); color: #fff; font-size: clamp(26px, 6vw, 35px); text-align: center; width: clamp(140px, 40vw, 180px); letter-spacing: 12px; outline: none; font-family: 'Courier New', Courier, monospace; font-weight: 300; margin-bottom: 35px; padding-bottom: 5px; transition: border-color 0.3s ease; }
+        
+        #birthday-ui {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 1.5s ease; pointer-events: auto; text-align: center;
+        }
+
+        #bday-input {
+            background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.6);
+            color: #fff; font-size: clamp(26px, 6vw, 35px); text-align: center; 
+            width: clamp(140px, 40vw, 180px); letter-spacing: 12px; outline: none; 
+            font-family: 'Courier New', Courier, monospace; font-weight: 300;
+            margin-bottom: 35px; padding-bottom: 5px; transition: border-color 0.3s ease;
+        }
+        #bday-input:focus { border-bottom: 1px solid rgba(255,255,255,1); }
+        #bday-input::placeholder { color: rgba(255,255,255,0.3); }
+
         #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
-        #ghost-info { position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8; opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none; width: 95vw; max-width: 750px; }
+
+        #ghost-info {
+            position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%);
+            color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8;
+            opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none;
+            width: 95vw; max-width: 750px;
+        }
+        
         #oracle-group { will-change: transform, opacity, filter, letter-spacing; }
-        .ghost-header { font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); font-family: monospace; letter-spacing: 2px; font-weight: 400; white-space: nowrap; }
-        #ghost-oracle { font-size: clamp(9px, 2.6vw, 12.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; line-height: 1.5; white-space: nowrap; }
-        .ghost-footer { font-size: clamp(8px, 1.8vw, 10px); color: rgba(255,255,255,0.65); margin-top: 15px; letter-spacing: 1px; font-weight: 300; }
-        @media screen and (max-width: 768px) { #ghost-oracle { white-space: normal; line-height: 1.2; display: block; padding: 0 10px; } }
-        #ghost-quote { font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; display: none; opacity: 0; font-style: italic; line-height: 1.9; pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease; }
+
+        .ghost-header {
+            font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); 
+            font-family: monospace; letter-spacing: 2px; font-weight: 400; white-space: nowrap;
+        }
+        
+        #ghost-oracle {
+            font-size: clamp(9px, 2.6vw, 12.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; 
+            line-height: 2.2; white-space: nowrap;
+        }
+
+        .ghost-footer {
+            font-size: clamp(8px, 1.8vw, 10px); color: rgba(255,255,255,0.4); margin-top: 15px;
+            letter-spacing: 1px; font-weight: 300;
+        }
+
+        #ghost-quote {
+            font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; 
+            display: none; opacity: 0; font-style: italic; line-height: 1.9;
+            pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease;
+        }
         #ghost-quote:active { opacity: 0.5; }
-        @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; } 100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; } }
+
+        @keyframes windDissolve {
+            0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; }
+            100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; }
+        }
         .dissolve-anim { animation: windDissolve 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
-        @keyframes fadeInQuote { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @keyframes fadeInQuote {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .fade-in-anim { animation: fadeInQuote 2.5s ease forwards; }
     </style>
 </head>
@@ -55,6 +129,7 @@
     <div id="fade-in-overlay"></div>
     <div id="bg-image"></div>
     <div id="glass-overlay"></div>
+
     <div id="ui-layer">
         <div id="intro-box">
             <h1>躯壳之外<span class="en-title">BEYOND THE SHELL</span></h1>
@@ -62,10 +137,11 @@
         </div>
         <button id="dive-btn" class="btn-style" onclick="showInput()">构建密钥</button>
         <div id="birthday-ui">
-           <input type="text" id="bday-input" maxlength="4" placeholder="MMDD" autocomplete="off" pattern="\d*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+            <input type="text" id="bday-input" maxlength="4" placeholder="MMDD" autocomplete="off" pattern="\d*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
             <button id="awaken-btn" class="btn-style">唤醒 Ghost</button>
         </div>
     </div>
+
     <div id="ghost-info">
         <div id="oracle-group">
             <div class="ghost-header" id="ghost-coord"></div>
@@ -91,9 +167,11 @@
 
         function generateOracle(month, day, hue, phaseName) {
             let partA = "";
-            if (month === 2 && day === 3) partA = "在这抹月光浸染的丹宁冷冽中";
-            else if (phaseName === "赛博液态银") partA = "映照着冰冷的金属镜面波纹";
-            else if (phaseName === "高折射琉璃" || phaseName === "灵动水态") {
+            if (month === 2 && day === 3) {
+                partA = "在这抹月光浸染的丹宁冷冽中";
+            } else if (phaseName === "赛博液态银") {
+                partA = "映照着冰冷的金属镜面波纹";
+            } else if (phaseName === "高折射琉璃" || phaseName === "灵动水态") {
                 if (hue < 50/360) partA = "借由这束琥珀色琉璃的折射";
                 else if (hue < 170/360) partA = "于这片通透冰蓝的微光里";
                 else partA = "透过这层清澈异质的介质";
@@ -130,15 +208,13 @@
             linesGrass = new THREE.LineSegments(linesGeometry, new THREE.LineBasicMaterial({ color: 0xcceeff, transparent: true, opacity: 0.35 }));
             scene.add(linesGrass);
 
-            // ⚠️ 修复 3：提升纹理尺寸到 128px，增加平滑滤镜，根除中心彩点噪点
+            // ⚠️ 修复 3：提升分辨率至 128px，开启平滑算法根除彩点
             const canvas = document.createElement('canvas'); canvas.width = 128; canvas.height = 128; 
             const context = canvas.getContext('2d'); const gradient = context.createRadialGradient(64, 64, 0, 64, 64, 64);
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
-            gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.9)'); 
-            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.9)'); gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
             context.fillStyle = gradient; context.fillRect(0, 0, 128, 128);
             const pTexture = new THREE.CanvasTexture(canvas);
-            pTexture.minFilter = THREE.LinearFilter; // 开启线性平滑
+            pTexture.minFilter = THREE.LinearFilter;
 
             const bokehGeometry = new THREE.BufferGeometry(); const bokehPos = new Float32Array(140 * 3);
             for(let i = 0; i < 140; i++) { bokehPos[i*3] = (Math.random() - 0.5) * 35; bokehPos[i*3+1] = (Math.random() - 0.5) * 35; bokehPos[i*3+2] = Math.random() * 18 - 15; }
@@ -150,8 +226,6 @@
             new THREE.OBJLoader().load('flower.obj', (o) => { o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); const box = new THREE.Box3().setFromObject(o); o.position.sub(box.getCenter(new THREE.Vector3())); metalFlower = new THREE.Group(); metalFlower.add(o); metalFlower.scale.set(2.5,2.5,2.5); metalFlower.position.y = 1.5; metalFlower.visible = false; scene.add(metalFlower); });
             ghostLight = new THREE.PointLight(0xffffff, 0, 12); scene.add(ghostLight); scene.add(new THREE.AmbientLight(0xffffff, 0.6));
             
-            window.addEventListener('mousemove', (e) => { mouse.x = (e.clientX/window.innerWidth)*2-1; mouse.y = -(e.clientY/window.innerHeight)*2+1; });
-            window.addEventListener('touchmove', (e) => { if(e.touches.length>0) { mouse.x=(e.touches[0].clientX/window.innerWidth)*2-1; mouse.y=-(e.touches[0].clientY/window.innerHeight)*2+1; } }, { passive: true });
             window.addEventListener('resize', onWindowResize);
             
             // ⚠️ 修复 2：移动端触控即刻响应
@@ -159,6 +233,8 @@
             awakenBtn.addEventListener('click', awakenGhost);
             awakenBtn.addEventListener('touchstart', (e) => { e.preventDefault(); awakenGhost(); }, { passive: false });
             
+            window.addEventListener('mousemove', (e) => { mouse.x = (e.clientX/window.innerWidth)*2-1; mouse.y = -(e.clientY/window.innerHeight)*2+1; });
+            window.addEventListener('touchmove', (e) => { if(e.touches.length>0) { mouse.x=(e.touches[0].clientX/window.innerWidth)*2-1; mouse.y=-(e.touches[0].clientY/window.innerHeight)*2+1; } }, { passive: true });
             animate();
         }
 
@@ -191,7 +267,7 @@
             if (inputVal === "0203") {
                 const uniqueColor = new THREE.Color().setHSL(0.645, 0.45, 0.8);
                 ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; colorDesc = "月光浸染的丹宁蓝频段"; phaseName = "暗物质瓷"; finalHue = 0.645;
-                // ⚠️ 修复 1：修正 0203 比例，高度增加，宽度压窄，呈现高挺姿态
+                // ⚠️ 修复 1：修正 0203 比例，高度拉长，宽度压窄，呈现挺拔姿态
                 targetScale.x = (1.3 + (month / 12) * 3.0) * 0.8;
                 targetScale.y = (1.3 + (day / 31) * 3.5) * 1.25; 
             } else {
@@ -206,7 +282,7 @@
                 ghostLight.color.copy(uniqueColor); if(phaseVal!==2) ghostLight.intensity = 2.0;
                 targetScale.x = 1.3 + (month / 12) * 3.0; targetScale.y = 1.3 + (day / 31) * 3.5;
             }
-            ghostMaterial.needsUpdate = true; targetScale.z = targetScale.x; metalFlower.visible = true; isAwakening = true; document.getElementById('ui-layer').style.opacity = '0'; setTimeout(() => document.getElementById('ui-layer').style.display = 'none', 1500);
+            ghostMaterial.needsUpdate = true; targetScale.z = targetScale.x; metalFlower.visible = true; isAwakening = true; document.getElementById('ui-layer').style.opacity = '0'; setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500);
             document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：${phaseName} | 色谱：${colorDesc} ]`;
             document.getElementById('ghost-oracle').innerHTML = generateOracle(month, day, finalHue, phaseName);
             document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是一个时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
