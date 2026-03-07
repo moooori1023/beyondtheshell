@@ -27,9 +27,8 @@
         #glass-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(10, 15, 20, 0.45); 
-            /* ⚠️ 修复：增加模糊雾度至 18px，代替阴影，确保坐标文字在手机端高光下清晰可见 */
-            backdrop-filter: blur(18px); 
-            -webkit-backdrop-filter: blur(18px);
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
             z-index: 5; transition: opacity 2.5s ease; pointer-events: none;
         }
 
@@ -43,10 +42,9 @@
             text-align: center; width: 90%; max-width: 520px; padding: 0;
             margin-bottom: clamp(20px, 5vh, 40px);
         }
-        /* ⚠️ 修复：剔除所有引导文字的阴影 */
         #intro-box h1 {
             font-size: clamp(16px, 4vw, 20px); font-weight: 400; letter-spacing: 5px; 
-            margin-bottom: 15px; color: #fff; line-height: 1.4; text-shadow: none;
+            margin-bottom: 15px; color: #fff; line-height: 1.4;
         }
         .en-title {
             display: block; font-size: clamp(9px, 2vw, 11px); font-family: monospace; 
@@ -54,7 +52,7 @@
         }
         #intro-box p {
             font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; 
-            letter-spacing: 2px; color: rgba(255,255,255,0.85); text-shadow: none;
+            letter-spacing: 2px; color: rgba(255,255,255,0.85);
         }
 
         .btn-style { 
@@ -84,35 +82,31 @@
         #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
 
         #ghost-info {
-            position: fixed; bottom: clamp(25px, 6vh, 45px); left: 50%; transform: translateX(-50%);
-            color: rgba(255,255,255,0.9); text-align: center; font-weight: 300;
+            position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%);
+            color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8;
             opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none;
-            width: 85%; max-width: 750px;
+            width: 90%; max-width: 750px;
         }
         
         #oracle-group {
             will-change: transform, opacity, filter, letter-spacing;
         }
 
-        /* ⚠️ 修复：剔除坐标文字的阴影，微调不透明度和字重，确保在加强的遮罩上清晰可见 */
+        /* ⚠️ 修复 3：无阴影提纯，颜色提至纯白，字重微增，确保高对比度清晰 */
         .ghost-header {
-            font-size: clamp(9px, 2vw, 11px); color: rgba(255,255,255,0.8); margin-bottom: clamp(10px, 2.5vh, 15px); 
-            font-family: monospace; letter-spacing: 2px; font-weight: 400; line-height: 1.6;
-            text-shadow: none; 
+            font-size: clamp(10px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); 
+            font-family: monospace; letter-spacing: 3px; font-weight: 400; 
         }
         
-        /* ⚠️ 修复：剔除解析词的阴影，确保文字清晰。允许自然舒展完整显示 */
+        /* ⚠️ 修复 1 & 4：解除截断，自然舒展，通过 clamp 控制在手机端不超过 3 行 */
         #ghost-oracle {
-            font-size: clamp(11.5px, 2.8vw, 13px); color: rgba(255,255,255,0.85); font-weight: 300; 
-            letter-spacing: 1.5px; line-height: 1.95; white-space: normal; text-shadow: none;
+            font-size: clamp(11px, 2.8vw, 13.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; 
+            line-height: 1.8;
         }
 
-        /* ⚠️ 修复：剔除箴言的阴影。强制两行内排下并完整显示 */
         #ghost-quote {
-            /* ⚠️ 修复：在Notion环境下，强制使用较小的固定字号和精准行高，确保这两行神谕整齐且完整 */
-            font-size: 12.5px; color: rgba(255,255,255,0.7); font-weight: 300; 
-            letter-spacing: 1.5px; display: none; opacity: 0; font-style: italic; 
-            line-height: 1.85; text-shadow: none; width: 95vw; max-width: 500px;
+            font-size: clamp(11px, 2.8vw, 13.5px); color: #bbb; font-weight: 300; letter-spacing: 1.5px; 
+            display: none; opacity: 0; font-style: italic; line-height: 2.0;
         }
 
         @keyframes windDissolve {
@@ -177,6 +171,7 @@
         let targetScale = { x: 2.5, y: 2.5, z: 2.5 };
         let heartBase = 1.0, heartSub = 0.5;
 
+        // 恢复完美版的 12 种底层灵魂描述词库
         function generateOracle(month, day) {
             let spiritualBase = "";
             if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) spiritualBase = "散发着不可驯服的初生动能，以一种原始而纯粹的锐度撕裂平庸";
@@ -232,13 +227,13 @@
             linesGrass = new THREE.LineSegments(linesGeometry, linesMaterial);
             scene.add(linesGrass);
 
+            // ⚠️ 修复 2：画布翻倍至 64x64，纯白中心向外平滑模糊渐变，彻底解决方形/彩色噪点
             const canvas = document.createElement('canvas');
-            canvas.width = 64; canvas.height = 64; // 提升纹理精度，根除彩色噪点
+            canvas.width = 64; canvas.height = 64;
             const context = canvas.getContext('2d');
             const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
-            // ⚠️ 修复 1：粒子纹理净化补丁。中心纯白，向外高斯模糊，彻底废除导致方形的粗糙算法。现在的粒子将恢复为空灵晶莹的纯净圆晕。
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
-            gradient.addColorStop(0.3, 'rgba(230, 240, 255, 0.6)'); // 稍微带一点赛博清冷
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
             gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
             context.fillStyle = gradient; context.fillRect(0, 0, 64, 64);
             const particleTexture = new THREE.CanvasTexture(canvas);
@@ -248,14 +243,17 @@
             for(let i = 0; i < 140 * 3; i++) { bokehPositions[i] = (Math.random() - 0.5) * 35; }
             bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPositions, 3));
             const bokehMaterial = new THREE.PointsMaterial({ 
-                color: 0xffeebb, size: 0.38, transparent: true, opacity: 0.8, 
+                color: 0xffeebb, size: 0.35, transparent: true, opacity: 0.85, 
                 map: particleTexture, depthWrite: false, blending: THREE.AdditiveBlending 
             });
             bokehParticles = new THREE.Points(bokehGeometry, bokehMaterial);
             bokehParticles.position.z = -5;
             scene.add(bokehParticles);
 
-            ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
+            ghostMaterial = new THREE.MeshPhysicalMaterial({ 
+                color: 0xffffff, metalness: 0.9, roughness: 0.1, emissive: 0xffffff, emissiveIntensity: 0.1,
+                transparent: true, opacity: 1.0, side: THREE.DoubleSide
+            });
 
             const objLoader = new THREE.OBJLoader();
             objLoader.load('flower.obj', function (object) {
@@ -375,82 +373,38 @@
             const day = parseInt(inputVal.substring(2, 4));
             if(month < 1 || month > 12 || day < 1 || day > 31) { alert("坐标格式有误，请输入合法日期"); return; }
 
-            // ⚠️ 修复：色彩算法净化。全色相环解禁，但绝对纯洁禁红（HSL 340-20度）
-            let rawHue = ((month - 1) * 31 + day) % 360; 
+            // 恢复完美版的经典 4 色系算法
+            const hashColor = (month * 13 + day * 7) % 100; 
+            const hue = 0.45 + (hashColor / 100) * 0.45; 
+            const saturation = 0.6 + (day / 31) * 0.4; 
+            const lightness = 0.4 + (month % 3) * 0.15; 
+            const uniqueColor = new THREE.Color().setHSL(hue, saturation, lightness);
             
-            let finalHue;
-            // 如果生成的色相落在红色区间（340度 - 20度）
-            if (rawHue > 340 || rawHue < 20) {
-                // 将其“弹射”到黄色或冷色区间，确保绝对纯洁无红
-                finalHue = (rawHue + 40) % 360; 
-            } else {
-                finalHue = rawHue; 
-            }
-            
-            const hue = finalHue / 360; 
-            // 材质复位
-            ghostMaterial.color.set('#fff');
-            ghostMaterial.emissive.set('#000');
-            ghostMaterial.metalness = 0.0;
-            ghostMaterial.roughness = 0.5;
-            ghostMaterial.transmission = 0.0;
-            ghostMaterial.ior = 1.5;
-            ghostMaterial.clearcoat = 0.0;
-            ghostMaterial.opacity = 1.0;
-            ghostMaterial.emissiveIntensity = 0.0;
-
-            let phaseName = "";
-            let colorDesc = "";
-            
-            // ⚠️ 修复：差异化物性解禁補丁。增加赛博银金属、水态、玻璃材质差异。
-            const phaseVal = (month * 3 + day) % 4; // 裂变为 4 种物性
-            
-            if (rawHue === 0 || month * day === 1) { // 极低概率触发极致镜面（银色赛博金属）
-                ghostMaterial.color.set('#cccccc');
-                ghostMaterial.emissive.set('#999999');
-                ghostMaterial.metalness = 1.0;
-                ghostMaterial.roughness = 0.01; // 极致光滑镜面
-                ghostMaterial.emissiveIntensity = 0.3;
-                phaseName = "赛博镜面银";
-                colorDesc = "mirror mirror mirror 镜面频段";
-            } else if (phaseVal === 0) { // 灵动水态 (低折射)
-                ghostMaterial.color.set('#ffffff');
-                ghostMaterial.transmission = 0.92;
-                ghostMaterial.ior = 1.33; // 纯水折射率
-                ghostMaterial.roughness = 0.15; // 模拟流动水面
-                ghostMaterial.opacity = 0.1;
-                ghostMaterial.clearcoat = 0.8;
-                phaseName = "灵动水体";
-                colorDesc = "清水感知频段";
-            } else if (phaseVal === 1) { // 高折射晶体（玻璃）
-                ghostMaterial.color.set('#ffffff');
-                ghostMaterial.transmission = 0.98;
-                ghostMaterial.ior = 1.55; // 晶体折射率
-                ghostMaterial.roughness = 0.02; // 极其光滑玻璃
-                ghostMaterial.opacity = 0.15;
-                ghostMaterial.clearcoat = 1.0;
-                phaseName = "高折射晶体";
-                colorDesc = "晶体折射频段";
-            } else { // 差异化多彩 Ghost（保持暗物质瓷质感，禁红）
-                const uniqueColor = new THREE.Color().setHSL(hue, 0.7 + (day / 31) * 0.3, 0.4 + (month % 3) * 0.15);
-                ghostMaterial.color.set('#111111');
-                ghostMaterial.emissive.copy(uniqueColor);
-                ghostMaterial.metalness = 0.0;
-                ghostMaterial.roughness = 0.9;
-                ghostMaterial.opacity = 1.0;
-                ghostMaterial.emissiveIntensity = 0.3;
-                phaseName = "暗物质瓷";
-                if (finalHue < 50) colorDesc = "amber amber amber 琥珀频段";
-                else if (finalHue < 80) colorDesc = "lime lime lime 微光频段";
-                else if (finalHue < 170) colorDesc = "cyan cyan cyan 青蓝频段";
-                else if (finalHue < 250) colorDesc = "denim denim denim 丹宁频段";
-                else if (finalHue < 300) colorDesc = "violet violet violet 赛博紫";
-                else colorDesc = "magenta magenta magenta 千禧粉";
-            }
-
-            ghostMaterial.needsUpdate = true;
-            ghostLight.color.copy(ghostMaterial.metalness === 1.0 ? new THREE.Color('#999999') : ghostMaterial.emissive);
+            ghostMaterial.color.copy(uniqueColor);
+            ghostMaterial.emissive.copy(uniqueColor);
+            ghostLight.color.copy(uniqueColor);
             ghostLight.intensity = 2.0;
+
+            let colorDesc = "";
+            if (hue < 0.55) colorDesc = "理性的青蓝频段";
+            else if (hue < 0.7) colorDesc = "深邃的丹宁蓝频段";
+            else if (hue < 0.85) colorDesc = "异质的赛博紫频段";
+            else colorDesc = "低保真的千禧淡粉频段";
+
+            // 恢复完美版的经典 3 相态算法
+            const phaseVal = (month * 7 + day * 11) % 3;
+            let phaseName = "";
+            if (phaseVal === 0) {
+                ghostMaterial.metalness = 1.0; ghostMaterial.roughness = 0.1; ghostMaterial.opacity = 1.0; ghostMaterial.clearcoat = 1.0; ghostMaterial.emissiveIntensity = 0.4;
+                phaseName = "液态金属"; 
+            } else if (phaseVal === 1) {
+                ghostMaterial.metalness = 0.2; ghostMaterial.roughness = 0.05; ghostMaterial.opacity = 0.4; ghostMaterial.clearcoat = 1.0; ghostMaterial.emissiveIntensity = 0.6; 
+                phaseName = "色散晶体"; 
+            } else {
+                ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; ghostMaterial.opacity = 1.0; ghostMaterial.clearcoat = 0.0; ghostMaterial.emissiveIntensity = 0.3;
+                phaseName = "暗物质瓷"; 
+            }
+            ghostMaterial.needsUpdate = true;
 
             targetScale.x = 1.3 + (month / 12) * 3.0; 
             targetScale.z = targetScale.x;
@@ -470,7 +424,7 @@
             setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500);
             
             const oracleText = generateOracle(month, day);
-            document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 物性：${phaseName} | 色谱：${colorDesc} ]`;
+            document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：${phaseName} | 色谱：${colorDesc} ]`;
             document.getElementById('ghost-oracle').innerHTML = oracleText;
             document.getElementById('ghost-info').style.opacity = '1';
 
