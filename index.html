@@ -19,39 +19,31 @@
             z-index: 0; 
         }
 
-        canvas { 
-            display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            z-index: 1; pointer-events: none; 
-        }
+        canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
 
-        /* ⚠️ 修复 2：彻底调低模糊与颜色，确保背景和花朵“通透、清晰” */
+        /* ⚠️ 物理通透感修复：移除大雾，保留极致清晰度 */
         #glass-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.15); /* 极淡的黑色层 */
-            backdrop-filter: blur(2px); /* 仅保留轻微的空气质感 */
-            -webkit-backdrop-filter: blur(2px);
+            background: rgba(0, 0, 0, 0.15); 
+            backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
             z-index: 5; transition: opacity 2.5s ease; pointer-events: none;
         }
 
-        /* ⚠️ 修复 3：初始压暗层，确保引导词可读性 */
+        /* ⚠️ 初始界面修复：压暗背景，衬托白色引导词 */
         #ui-layer {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(0, 0, 0, 0.38); /* 相比之前压暗了约 3%-5% */
+            background: rgba(0, 0, 0, 0.38);
             z-index: 10; transition: opacity 1.5s ease;
         }
 
-        #intro-box {
-            text-align: center; width: 90%; max-width: 520px; padding: 0;
-            margin-bottom: clamp(20px, 5vh, 40px);
-        }
+        #intro-box { text-align: center; width: 90%; max-width: 520px; margin-bottom: 40px; }
         #intro-box h1 { font-size: clamp(16px, 4vw, 20px); font-weight: 400; letter-spacing: 5px; margin-bottom: 15px; }
         .en-title { display: block; font-size: clamp(9px, 2vw, 11px); font-family: monospace; letter-spacing: 8px; color: rgba(255,255,255,0.5); margin-top: 8px; }
         #intro-box p { font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; letter-spacing: 2px; color: rgba(255,255,255,0.85); }
 
         .btn-style { 
-            background: rgba(255, 255, 255, 0.9); color: #000; border: none; 
-            padding: 12px 40px; border-radius: 30px; 
+            background: rgba(255, 255, 255, 0.9); color: #000; border: none; padding: 12px 40px; border-radius: 30px; 
             cursor: pointer; font-size: 13px; letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease; pointer-events: auto;
         }
         .btn-style:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.3); }
@@ -64,26 +56,27 @@
         #ghost-info {
             position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%);
             color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8;
-            opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none;
-            width: 95vw; max-width: 750px;
+            opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none; width: 95vw;
         }
         
-        #oracle-group { will-change: transform, opacity, filter, letter-spacing; }
-
         .ghost-header { font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: 15px; font-family: monospace; letter-spacing: 2px; font-weight: 400; white-space: nowrap; }
         
-        /* ⚠️ 修复 1：解读词缩减为单行，文字精炼 */
+        /* ⚠️ 判词修复：单行、去AI味、自然意象 */
         #ghost-oracle { font-size: clamp(10px, 2.6vw, 13.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; line-height: 1.5; white-space: nowrap; }
 
+        /* ⚠️ 绝对参数小字样式 */
         .ghost-footer { font-size: clamp(8.5px, 1.8vw, 11px); color: rgba(255,255,255,0.5); margin-top: 15px; letter-spacing: 1px; font-weight: 300; }
 
-        #ghost-quote { font-size: 12px; color: #ffffff; font-weight: 400; letter-spacing: 1.5px; display: none; opacity: 0; font-style: italic; line-height: 1.9; pointer-events: auto; cursor: pointer; }
+        #ghost-quote {
+            font-size: 12px; color: #ffffff; font-weight: 400; letter-spacing: 1.5px; 
+            display: none; opacity: 0; font-style: italic; line-height: 1.9;
+            pointer-events: auto; cursor: pointer;
+        }
 
         @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0); } 100% { opacity: 0; filter: blur(12px); transform: translate3d(20px, -10px, 0); } }
         .dissolve-anim { animation: windDissolve 2.5s forwards; }
         @keyframes fadeInQuote { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in-anim { animation: fadeInQuote 2.5s ease forwards; }
-
     </style>
 </head>
 <body>
@@ -94,7 +87,7 @@
     <div id="ui-layer">
         <div id="intro-box">
             <h1>躯壳之外<span class="en-title">BEYOND THE SHELL</span></h1>
-            <p>这里是过滤数字噪点的私人温室。<br>请在此键入你的诞生之日（如 0203）。</p>
+            <p>这里是过滤数字噪点的私人温室。<br>请在此键入你的诞生之日（如 0203），<br>这串你在物理世界的初始时间戳，将作为唤醒的唯一密钥。</p>
         </div>
         <button id="dive-btn" class="btn-style" onclick="showInput()">构建密钥</button>
         <div id="birthday-ui">
@@ -126,7 +119,6 @@
         let ghostMaterial, ghostLight, animTimer1, animTimer2;
         let currentScale = { x: 2.5, y: 2.5, z: 2.5 }, targetScale = { x: 2.5, y: 2.5, z: 2.5 };
 
-        // ⚠️ 修复 1：单句精悍版神谕
         function generateOracle(month, day) {
             const oracles = [
                 "季风拂过潮湿的苔藓，在时间的缝隙中寻找生机回声。",
@@ -149,16 +141,17 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
 
+            // 环境映射
             const envCanvas = document.createElement('canvas');
             envCanvas.width = 64; envCanvas.height = 64;
             const envCtx = envCanvas.getContext('2d');
             const envGrad = envCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
-            envGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
-            envGrad.addColorStop(1, 'rgba(10, 15, 20, 1)');
+            envGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); envGrad.addColorStop(1, 'rgba(10, 15, 20, 1)');
             envCtx.fillStyle = envGrad; envCtx.fillRect(0, 0, 64, 64);
             scene.environment = new THREE.CanvasTexture(envCanvas);
             scene.environment.mapping = THREE.EquirectangularReflectionMapping;
 
+            // 草地
             const grassWidth = 80, grassDepth = 50, lineCount = 5500;
             const linesGeometry = new THREE.BufferGeometry();
             const positions = new Float32Array(lineCount * 18); 
@@ -172,20 +165,19 @@
             linesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             scene.add(new THREE.LineSegments(linesGeometry, new THREE.LineBasicMaterial({ color: 0xcceeff, transparent: true, opacity: 0.35 })));
 
+            // 粒子系统：恢复散焦白光
             const canvas = document.createElement('canvas');
-            canvas.width = 64; canvas.height = 64; 
-            const ctx = canvas.getContext('2d');
-            const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-            grad.addColorStop(0, 'rgba(255, 255, 255, 1)'); grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            ctx.fillStyle = grad; ctx.fillRect(0, 0, 64, 64);
+            canvas.width = 64; canvas.height = 64;
+            const context = canvas.getContext('2d');
+            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            context.fillStyle = gradient; context.fillRect(0, 0, 64, 64);
             const particleTexture = new THREE.CanvasTexture(canvas);
 
             const bokehGeometry = new THREE.BufferGeometry();
             const bokehPositions = new Float32Array(140 * 3);
             for(let i = 0; i < 140; i++) { 
-                bokehPositions[i*3] = (Math.random() - 0.5) * 35; 
-                bokehPositions[i*3+1] = (Math.random() - 0.5) * 35; 
-                bokehPositions[i*3+2] = Math.random() * 18 - 15; 
+                bokehPositions[i*3] = (Math.random() - 0.5) * 35; bokehPositions[i*3+1] = (Math.random() - 0.5) * 35; bokehPositions[i*3+2] = Math.random() * 18 - 15; 
             }
             bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPositions, 3));
             bokehParticles = new THREE.Points(bokehGeometry, new THREE.PointsMaterial({ color: 0xffffff, size: 0.35, sizeAttenuation: true, transparent: true, opacity: 0.85, map: particleTexture, depthTest: false, blending: THREE.AdditiveBlending }));
@@ -222,8 +214,7 @@
                     metalFlower.rotation.y += 0.25;
                     if (Math.abs(targetScale.y - currentScale.y) < 0.05) isAwakening = false;
                 } else {
-                    metalFlower.rotation.y += 0.003;
-                    metalFlower.position.y = 1.5 + Math.sin(time) * 0.15;
+                    metalFlower.rotation.y += 0.003; metalFlower.position.y = 1.5 + Math.sin(time) * 0.15;
                 }
                 ghostLight.position.copy(metalFlower.position);
             }
@@ -239,21 +230,24 @@
 
         function startOracleTimer() {
             clearTimeout(animTimer1); clearTimeout(animTimer2);
+            const oracleGroup = document.getElementById('oracle-group');
+            const quoteEl = document.getElementById('ghost-quote');
             animTimer1 = setTimeout(() => {
-                document.getElementById('oracle-group').classList.add('dissolve-anim');
+                oracleGroup.classList.add('dissolve-anim');
                 animTimer2 = setTimeout(() => {
-                    document.getElementById('oracle-group').style.display = 'none';
-                    document.getElementById('ghost-quote').style.display = 'block';
-                    document.getElementById('ghost-quote').classList.add('fade-in-anim');
+                    oracleGroup.style.display = 'none';
+                    quoteEl.style.display = 'block';
+                    quoteEl.classList.add('fade-in-anim');
                 }, 2500);
             }, 15000); 
         }
 
         function restoreOracle() {
-            document.getElementById('ghost-quote').style.display = 'none';
-            document.getElementById('oracle-group').style.display = 'block';
-            document.getElementById('oracle-group').classList.remove('dissolve-anim');
-            startOracleTimer();
+            const oracleGroup = document.getElementById('oracle-group');
+            const quoteEl = document.getElementById('ghost-quote');
+            quoteEl.style.display = 'none'; quoteEl.classList.remove('fade-in-anim');
+            oracleGroup.style.display = 'block'; oracleGroup.classList.remove('dissolve-anim');
+            void oracleGroup.offsetWidth; startOracleTimer();
         }
 
         function awakenGhost() {
@@ -261,45 +255,43 @@
             if(inputVal.length !== 4) return;
             const month = parseInt(inputVal.substring(0, 2)), day = parseInt(inputVal.substring(2, 4));
             
+            // 材质复位
             ghostMaterial.color.set('#fff'); ghostMaterial.emissive.set('#000');
             ghostMaterial.metalness = 0; ghostMaterial.roughness = 0.5;
             ghostMaterial.transmission = 0; ghostMaterial.ior = 1.5;
             ghostMaterial.thickness = 0; ghostMaterial.opacity = 1;
 
             if (inputVal === "0203") {
-                const c = new THREE.Color().setHSL(0.6615, 0.6387, 0.7);
-                ghostMaterial.color.set('#111'); ghostMaterial.emissive.copy(c);
-                ghostMaterial.roughness = 0.9; ghostLight.color.copy(c); ghostLight.intensity = 2.0;
+                const uniqueColor = new THREE.Color().setHSL(0.6615, 0.6387, 0.7);
+                ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor);
+                ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9;
+                ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0;
                 document.getElementById('ghost-coord').innerHTML = `[ 坐标：0203 | 相态：暗物质瓷 ]`;
             } else {
-                let hue = ((month - 1) * 31 + day) % 360; 
-                if (hue > 340 || hue < 20) hue = (hue + 40) % 360; 
-                const c = new THREE.Color().setHSL(hue / 360, 0.3, 0.4);
+                let rawHue = ((month - 1) * 31 + day) % 360; if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360; 
+                const uniqueColor = new THREE.Color().setHSL(rawHue / 360, 0.3, 0.4);
                 const phaseVal = (month * 7 + day * 11) % 4;
                 if (phaseVal === 1) { // 琉璃：高折射去曝光
-                    ghostMaterial.color.copy(c).multiplyScalar(0.2); 
-                    ghostMaterial.transmission = 1; ghostMaterial.ior = 1.55; 
-                    ghostMaterial.roughness = 0.02; ghostMaterial.thickness = 2.0;
-                    ghostMaterial.attenuationColor = c; ghostMaterial.attenuationDistance = 0.5;
-                    ghostLight.intensity = 0.4;
-                    document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：高折射琉璃 ]`;
+                    ghostMaterial.color.copy(uniqueColor).multiplyScalar(0.2); 
+                    ghostMaterial.transmission = 1; ghostMaterial.ior = 1.55; ghostMaterial.roughness = 0.02; ghostMaterial.thickness = 2.0;
+                    ghostMaterial.attenuationColor = uniqueColor; ghostMaterial.attenuationDistance = 0.5;
+                    ghostLight.intensity = 0.4; document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：高折射琉璃 ]`;
                 } else if (phaseVal === 0) { 
                     ghostMaterial.metalness = 1; ghostMaterial.roughness = 0.05; ghostMaterial.color.set('#aaa');
                     document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：赛博液态银 ]`;
                 } else {
-                    ghostMaterial.color.set('#1a1a1a'); ghostMaterial.emissive.copy(c); ghostMaterial.roughness = 0.9;
+                    ghostMaterial.color.set('#1a1a1a'); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.roughness = 0.9;
                     document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：暗物质瓷 ]`;
                 }
-                ghostLight.color.copy(c); if(phaseVal!==1) ghostLight.intensity = 2.0;
+                ghostLight.color.copy(uniqueColor); if(phaseVal!==1) ghostLight.intensity = 2.0;
             }
 
             targetScale.x = 1.3 + (month / 12) * 3.0; targetScale.y = 1.3 + (day / 31) * 3.5;   
             metalFlower.visible = true; isAwakening = true;
             document.getElementById('ui-layer').style.opacity = '0';
             setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500);
-            
             document.getElementById('ghost-oracle').innerHTML = generateOracle(month, day);
-            document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是一个时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
+            document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是一个刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
             document.getElementById('ghost-info').style.opacity = '1';
             gardenActive = true; startOracleTimer();
         }
