@@ -45,14 +45,7 @@
         #ghost-oracle { font-size: clamp(9px, 2.6vw, 12.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; line-height: 2.2; white-space: nowrap; }
         
         /* ⚠️ 底部小字：字号与坐标对齐，禁止换行 */
-        .ghost-footer { 
-            font-size: clamp(9px, 2.2vw, 12px); 
-            color: rgba(255,255,255,0.4); 
-            margin-top: 15px; 
-            letter-spacing: 1px; 
-            font-weight: 300; 
-            white-space: nowrap; 
-        }
+        .ghost-footer { font-size: clamp(9px, 2.2vw, 12px); color: rgba(255,255,255,0.4); margin-top: 15px; letter-spacing: 1px; font-weight: 300; white-space: nowrap; }
 
         #ghost-quote { font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; display: none; opacity: 0; font-style: italic; line-height: 1.9; pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease; }
         @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; } 100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; } }
@@ -148,6 +141,7 @@
             linesGrass = new THREE.LineSegments(linesGeometry, new THREE.LineBasicMaterial({ color: 0xcceeff, transparent: true, opacity: 0.35 }));
             scene.add(linesGrass);
 
+            // ⚠️ 修复 2：128px 纹理根除彩点
             const pCanvas = document.createElement('canvas'); pCanvas.width = 128; pCanvas.height = 128;
             const pCtx = pCanvas.getContext('2d'); const pGrad = pCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
             pGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); pGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)'); pGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
@@ -167,18 +161,13 @@
             window.addEventListener('resize', onWindowResize);
             window.addEventListener('mousemove', (e) => { mouse.x = (e.clientX/window.innerWidth)*2-1; mouse.y = -(e.clientY/window.innerHeight)*2+1; });
             window.addEventListener('touchmove', (e) => { if(e.touches.length>0) { mouse.x=(e.touches[0].clientX/window.innerWidth)*2-1; mouse.y=-(e.touches[0].clientY/window.innerHeight)*2+1; } }, { passive: true });
-            
-            const btn = document.getElementById('awaken-btn');
-            btn.addEventListener('click', awakenGhost);
-            btn.addEventListener('touchstart', (e) => { e.preventDefault(); awakenGhost(); }, { passive: false });
             animate();
         }
 
         function updateLinesGrass(time) {
             const pos = linesGrass.geometry.attributes.position.array;
             for (let i = 0; i < 5500; i++) {
-                const baseX = pos[i*18 + 0]; const z = pos[i*18 + 2];
-                const wind = Math.sin(time * 1.5 + z * 0.2); const mouseAvoid = gardenActive ? mouse.x * 1.5 : 0; const totalOffset = wind + mouseAvoid;
+                const baseX = pos[i*18 + 0]; const z = pos[i*18 + 2]; const wind = Math.sin(time * 1.5 + z * 0.2); const mouseAvoid = gardenActive ? mouse.x * 1.5 : 0; const totalOffset = wind + mouseAvoid;
                 pos[i*18 + 3] = baseX + totalOffset * 0.08; pos[i*18 + 9] = baseX + totalOffset * 0.3; pos[i*18 + 15] = baseX + totalOffset * 0.8;
             }
             linesGrass.geometry.attributes.position.needsUpdate = true;
@@ -212,12 +201,13 @@
 
             if (inputVal === "0203") {
                 const uniqueColor = new THREE.Color().setHSL(0.645, 0.45, 0.8);
-                ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; colorDesc = "月光浸染的丹宁蓝频段"; phaseName = "暗物质瓷"; finalHue = 0.645;
+                ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; colorDesc = "月光浸染的丹宁蓝频段"; phaseName = "暗物质瓷"; finalHue = 0.645;
+                // ⚠️ 修复 3：0203 宽度压缩 10%
                 targetScale.x = (1.3 + (month / 12) * 3.0) * 0.9;
             } else {
                 let rawHue = ((calcMonth - 1) * 31 + calcDay) % 360; if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360;
                 finalHue = rawHue / 360; const saturation = 0.2 + (calcDay / 31) * 0.25; const lightness = 0.35 + (calcMonth % 3) * 0.15; const uniqueColor = new THREE.Color().setHSL(finalHue, saturation, lightness);
-                if (rawHue < 50) colorDesc = "琥珀金"; else if (rawHue < 80) colorDesc = "微光绿"; else if (rawHue < 170) colorDesc = "冰蓝"; else if (rawHue < 250) colorDesc = "丹宁蓝"; else if (rawHue < 300) colorDesc = "魅影紫"; else colorDesc = "千禧粉";
+                if (rawHue < 50) colorDesc = "琥珀金频段"; else if (rawHue < 80) colorDesc = "微光绿频段"; else if (rawHue < 170) colorDesc = "深海的冰蓝频段"; else if (rawHue < 250) colorDesc = "丹宁频段"; else if (rawHue < 300) colorDesc = "魅影紫频段"; else colorDesc = "千禧粉频段";
                 const phaseVal = (calcMonth * 7 + calcDay * 11) % 6;
                 ghostMaterial.opacity = 1.0;
                 if (phaseVal === 1) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 0.6; ghostMaterial.ior = 1.33; ghostMaterial.thickness = 1.5; phaseName = "灵动水态";
@@ -233,7 +223,11 @@
             document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
             document.getElementById('ghost-info').style.opacity = '1'; gardenActive = true; startOracleTimer();
         }
-        document.getElementById('bday-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') awakenGhost(); }); init3D();
+        // ⚠️ 修复 1：移动端监听
+        const awakenBtn = document.getElementById('awaken-btn');
+        awakenBtn.addEventListener('click', awakenGhost);
+        awakenBtn.addEventListener('touchstart', (e) => { e.preventDefault(); awakenGhost(); }, { passive: false });
+        init3D();
     </script>
 </body>
 </html>
