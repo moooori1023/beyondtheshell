@@ -166,14 +166,11 @@
         let currentScale = { x: 2.5, y: 2.5, z: 2.5 }, targetScale = { x: 2.5, y: 2.5, z: 2.5 };
         let heartBase = 1.0, heartSub = 0.5, animTimer1, animTimer2;
 
-        // ⚠️ 判词逻辑重构：基于色相的黑塞三段式 [cite: 58, 59]
         function generateOracle(month, day) {
-            // 获取当前生成的色相值 (此函数由 awakenGhost 内部调用时计算)
             let rawHue = ((month - 1) * 31 + day) % 360;
             if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360;
             const hue = rawHue / 360;
 
-            // 片段 A：色谱意象 (基于 Hue)
             let partA = "";
             if (month === 2 && day === 3) partA = "在这抹深邃丹宁的冷冽中";
             else if (hue < 50/360) partA = "借由这束琥珀色的微光";
@@ -182,7 +179,6 @@
             else if (hue < 300/360) partA = "于这片异质的深紫魅影中";
             else partA = "抚过这片褪色的低保真色彩";
 
-            // 片段 B：黑塞式觉醒 (基于日期哈希)
             const basesB = [
                 "寻找通向自身之途的艰难", "啄破那层宿命定义的蛋壳", "忍受着孤独季风的洗礼",
                 "穿透那些被同化的法则", "越过两极博弈的灰度地带", "在系统的缝隙中完成呼吸",
@@ -190,7 +186,6 @@
             ];
             const partB = basesB[(month * day) % basesB.length];
 
-            // 片段 C：主权宣告
             const basesC = [
                 "确立你唯一的精神主权。", "标定你躯壳外的精神原点。", "完成对自我的终极命名。",
                 "确立那串无法复刻的坐标。", "它是系统无法模拟的密钥。"
@@ -213,8 +208,7 @@
             envCanvas.width = 64; envCanvas.height = 64;
             const envCtx = envCanvas.getContext('2d');
             const envGrad = envCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
-            envGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
-            envGrad.addColorStop(1, 'rgba(10, 15, 20, 1)');
+            envGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); envGrad.addColorStop(1, 'rgba(10, 15, 20, 1)');
             envCtx.fillStyle = envGrad; envCtx.fillRect(0, 0, 64, 64);
             const envMap = new THREE.CanvasTexture(envCanvas);
             envMap.mapping = THREE.EquirectangularReflectionMapping;
@@ -224,10 +218,8 @@
             const linesGeometry = new THREE.BufferGeometry();
             const positions = new Float32Array(lineCount * 18); 
             for (let i = 0; i < lineCount; i++) {
-                const x = Math.random() * grassWidth - grassWidth/2;
-                const z = Math.random() * grassDepth - grassDepth/2;
-                const h = 1.0 + Math.random() * 1.5;
-                const p0y = -1, p1y = -1 + h*0.33, p2y = -1 + h*0.66, p3y = -1 + h;
+                const x = Math.random() * grassWidth - grassWidth/2; const z = Math.random() * grassDepth - grassDepth/2;
+                const h = 1.0 + Math.random() * 1.5; const p0y = -1, p1y = -1 + h*0.33, p2y = -1 + h*0.66, p3y = -1 + h;
                 positions[i*18+0] = x; positions[i*18+1] = p0y; positions[i*18+2] = z;
                 positions[i*18+3] = x; positions[i*18+4] = p1y; positions[i*18+5] = z;
                 positions[i*18+6] = x; positions[i*18+7] = p1y; positions[i*18+8] = z;
@@ -239,10 +231,8 @@
             linesGrass = new THREE.LineSegments(linesGeometry, new THREE.LineBasicMaterial({ color: 0xcceeff, transparent: true, opacity: 0.35 }));
             scene.add(linesGrass);
 
-            const canvas = document.createElement('canvas');
-            canvas.width = 64; canvas.height = 64; 
-            const context = canvas.getContext('2d');
-            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+            const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64; 
+            const context = canvas.getContext('2d'); const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
             gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)'); gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
             context.fillStyle = gradient; context.fillRect(0, 0, 64, 64);
             const particleTexture = new THREE.CanvasTexture(canvas);
@@ -260,18 +250,14 @@
             const objLoader = new THREE.OBJLoader();
             objLoader.load('flower.obj', function (object) {
                 object.traverse(function (child) { if (child.isMesh) child.material = ghostMaterial; });
-                const box = new THREE.Box3().setFromObject(object);
-                object.position.sub(box.getCenter(new THREE.Vector3())); 
-                const wrapper = new THREE.Group();
-                wrapper.add(object); wrapper.scale.set(currentScale.x, currentScale.y, currentScale.z); wrapper.position.y = 1.5; 
+                const box = new THREE.Box3().setFromObject(object); object.position.sub(box.getCenter(new THREE.Vector3())); 
+                const wrapper = new THREE.Group(); wrapper.add(object); wrapper.scale.set(currentScale.x, currentScale.y, currentScale.z); wrapper.position.y = 1.5; 
                 metalFlower = wrapper; metalFlower.visible = false; scene.add(metalFlower);
             });
-            ghostLight = new THREE.PointLight(0xffffff, 0, 12);
-            scene.add(ghostLight); scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            ghostLight = new THREE.PointLight(0xffffff, 0, 12); scene.add(ghostLight); scene.add(new THREE.AmbientLight(0xffffff, 0.6));
             window.addEventListener('mousemove', (event) => { mouse.x = (event.clientX / window.innerWidth) * 2 - 1; mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; });
             window.addEventListener('touchmove', (event) => { if(event.touches.length > 0) { mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1; mouse.y = -(event.touches[0].clientY / window.innerHeight) * 2 + 1; } }, { passive: true });
-            window.addEventListener('resize', onWindowResize);
-            animate();
+            window.addEventListener('resize', onWindowResize); animate();
         }
 
         function updateLinesGrass(time) {
@@ -315,34 +301,32 @@
             ghostMaterial.color.set('#fff'); ghostMaterial.emissive.set('#000'); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.5; ghostMaterial.transmission = 0.0; ghostMaterial.ior = 1.5; ghostMaterial.thickness = 0.0; ghostMaterial.clearcoat = 0.0; ghostMaterial.opacity = 1.0; ghostMaterial.emissiveIntensity = 0.0;
 
             if (inputVal === "0203") {
-                const uniqueColor = new THREE.Color().setHSL(0.645, 0.65, 0.7);
-                ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; colorDesc = "深邃的丹宁蓝频段"; phaseName = "暗物质瓷";
+                // ⚠️ 修正 1：调淡 0203 蓝色，通过调高明度(L)至 0.8 实现混合白色的效果
+                const uniqueColor = new THREE.Color().setHSL(0.645, 0.45, 0.8);
+                ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; colorDesc = "调淡的丹宁蓝频段"; phaseName = "暗物质瓷";
             } else {
-                let rawHue = ((month - 1) * 31 + day) % 360;
-                if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360;
+                let rawHue = ((month - 1) * 31 + day) % 360; if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360;
                 const hue = rawHue / 360; const saturation = 0.2 + (day / 31) * 0.25; const lightness = 0.35 + (month % 3) * 0.15; const uniqueColor = new THREE.Color().setHSL(hue, saturation, lightness);
                 if (rawHue < 50) colorDesc = "生锈的琥珀金频段"; else if (rawHue < 80) colorDesc = "黯淡的微光绿频段"; else if (rawHue < 170) colorDesc = "深海的冰蓝频段"; else if (rawHue < 250) colorDesc = "哑光的丹宁频段"; else if (rawHue < 300) colorDesc = "褪色的赛博紫频段"; else colorDesc = "低保真的千禧粉频段";
                 const phaseVal = (month * 7 + day * 11) % 6;
+                
+                // ⚠️ 修正 2：强制锁定 opacity 为 1.0，防止 0616 及其他日期出现“全透明”无法观测的情况
+                ghostMaterial.opacity = 1.0;
+                
                 if (phaseVal === 0) { ghostMaterial.color.set('#aaaaaa'); ghostMaterial.emissive.set('#555555'); ghostMaterial.metalness = 1.0; ghostMaterial.roughness = 0.05; phaseName = "赛博液态银"; ghostLight.color.set('#ffffff'); ghostLight.intensity = 2.0;
-                } else if (phaseVal === 1) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 1.0; ghostMaterial.ior = 1.33; ghostMaterial.roughness = 0.1; ghostMaterial.thickness = 1.5; phaseName = "灵动水态"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 0.5;
-                } else if (phaseVal === 2) { ghostMaterial.color.copy(uniqueColor).multiplyScalar(0.2); ghostMaterial.transmission = 1.0; ghostMaterial.ior = 1.55; ghostMaterial.roughness = 0.02; ghostMaterial.thickness = 2.0; ghostMaterial.attenuationColor = uniqueColor; ghostMaterial.attenuationDistance = 0.5; phaseName = "高折射琉璃"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 0.4;
+                } else if (phaseVal === 1) { 
+                    ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 0.6; // 调低透射，增加实体感
+                    ghostMaterial.ior = 1.33; ghostMaterial.roughness = 0.1; ghostMaterial.thickness = 1.5; phaseName = "灵动水态"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 0.5;
+                } else if (phaseVal === 2) { 
+                    ghostMaterial.color.copy(uniqueColor).multiplyScalar(0.4); // 增加底色亮度
+                    ghostMaterial.transmission = 0.7; ghostMaterial.ior = 1.55; ghostMaterial.roughness = 0.02; ghostMaterial.thickness = 2.0; ghostMaterial.attenuationColor = uniqueColor; ghostMaterial.attenuationDistance = 0.5; phaseName = "高折射琉璃"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 0.4;
                 } else if (phaseVal === 3) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.metalness = 0.8; ghostMaterial.roughness = 0.5; ghostMaterial.emissive.copy(uniqueColor); phaseName = "哑光钛素"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0;
-                } else if (phaseVal === 4) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.metalness = 0.2; ghostMaterial.roughness = 0.6; ghostMaterial.transmission = 0.5; phaseName = "色散雾化晶体"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 1.0;
+                } else if (phaseVal === 4) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.metalness = 0.2; ghostMaterial.roughness = 0.6; ghostMaterial.transmission = 0.4; phaseName = "色散雾化晶体"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 1.0;
                 } else { ghostMaterial.color.set('#1a1a1a'); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; phaseName = "暗物质瓷"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; }
             }
-            ghostMaterial.needsUpdate = true;
-            targetScale.x = 1.3 + (month / 12) * 3.0; targetScale.y = 1.3 + (day / 31) * 3.5;
-            metalFlower.visible = true; isAwakening = true;
-            document.getElementById('ui-layer').style.opacity = '0'; setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500);
-            document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：${phaseName} | 色谱：${colorDesc} ]`;
-            document.getElementById('ghost-oracle').innerHTML = generateOracle(month, day);
-            document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是一个时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
-            document.getElementById('ghost-info').style.opacity = '1';
-            gardenActive = true; startOracleTimer();
+            ghostMaterial.needsUpdate = true; targetScale.x = 1.3 + (month / 12) * 3.0; targetScale.y = 1.3 + (day / 31) * 3.5; metalFlower.visible = true; isAwakening = true; document.getElementById('ui-layer').style.opacity = '0'; setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500); document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：${phaseName} | 色谱：${colorDesc} ]`; document.getElementById('ghost-oracle').innerHTML = generateOracle(month, day); document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是一个时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`; document.getElementById('ghost-info').style.opacity = '1'; gardenActive = true; startOracleTimer();
         }
-
-        document.getElementById('bday-input').addEventListener('keypress', function (e) { if (e.key === 'Enter') awakenGhost(); });
-        init3D();
+        document.getElementById('bday-input').addEventListener('keypress', function (e) { if (e.key === 'Enter') awakenGhost(); }); init3D();
     </script>
 </body>
 </html>
