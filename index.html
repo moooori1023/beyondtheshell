@@ -42,16 +42,19 @@
         #ghost-info { position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8; opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none; width: 95vw; max-width: 750px; }
         #oracle-group { will-change: transform, opacity, filter, letter-spacing; }
         .ghost-header { font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); font-family: monospace; letter-spacing: 2px; font-weight: 400; white-space: nowrap; }
+        #ghost-oracle { font-size: clamp(9px, 2.6vw, 12.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; line-height: 2.2; white-space: nowrap; }
         
-        /* ⚠️ 判词：仅在移动端折行，PC 保持单行 */
-        #ghost-oracle { font-size: clamp(9px, 2.6vw, 12.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; line-height: 2.0; white-space: nowrap; }
-        @media screen and (max-width: 768px) {
-            #ghost-oracle { white-space: normal; line-height: 1.2; }
+        /* ⚠️ 底部小字：字号与坐标对齐，禁止换行 */
+        .ghost-footer { 
+            font-size: clamp(9px, 2.2vw, 12px); 
+            color: rgba(255,255,255,0.4); 
+            margin-top: 15px; 
+            letter-spacing: 1px; 
+            font-weight: 300; 
+            white-space: nowrap; 
         }
 
-        .ghost-footer { font-size: clamp(8px, 1.8vw, 10px); color: rgba(255,255,255,0.4); margin-top: 15px; letter-spacing: 1px; font-weight: 300; }
         #ghost-quote { font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; display: none; opacity: 0; font-style: italic; line-height: 1.9; pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease; }
-        #ghost-quote:active { opacity: 0.5; }
         @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; } 100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; } }
         .dissolve-anim { animation: windDissolve 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
         @keyframes fadeInQuote { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -145,7 +148,6 @@
             linesGrass = new THREE.LineSegments(linesGeometry, new THREE.LineBasicMaterial({ color: 0xcceeff, transparent: true, opacity: 0.35 }));
             scene.add(linesGrass);
 
-            // ⚠️ 修复 3：128px 分辨率，开启 LinearFilter 根除彩点
             const pCanvas = document.createElement('canvas'); pCanvas.width = 128; pCanvas.height = 128;
             const pCtx = pCanvas.getContext('2d'); const pGrad = pCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
             pGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); pGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)'); pGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
@@ -159,18 +161,16 @@
             scene.add(bokehParticles);
 
             ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
-            new THREE.OBJLoader().load('flower.obj', (o) => { o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); const box = new THREE.Box3().setFromObject(o); o.position.sub(box.getCenter(new THREE.Vector3())); metalFlower = new THREE.Group(); metalFlower.add(o); metalFlower.scale.set(2.5,2.5,2.5); metalFlower.position.y = 1.5; metalFlower.visible = false; scene.add(metalFlower); });
+            new THREE.OBJLoader().load('flower.obj', (o) => { o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); const box = new THREE.Box3().setFromObject(o); o.position.sub(box.getCenter(new THREE.Vector3())); metalFlower = new THREE.Group(); metalFlower.add(o); metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); metalFlower.position.y = 1.5; metalFlower.visible = false; scene.add(metalFlower); });
             ghostLight = new THREE.PointLight(0xffffff, 0, 12); scene.add(ghostLight); scene.add(new THREE.AmbientLight(0xffffff, 0.6));
             
             window.addEventListener('resize', onWindowResize);
             window.addEventListener('mousemove', (e) => { mouse.x = (e.clientX/window.innerWidth)*2-1; mouse.y = -(e.clientY/window.innerHeight)*2+1; });
             window.addEventListener('touchmove', (e) => { if(e.touches.length>0) { mouse.x=(e.touches[0].clientX/window.innerWidth)*2-1; mouse.y=-(e.touches[0].clientY/window.innerHeight)*2+1; } }, { passive: true });
             
-            // ⚠️ 修复 1：移动端触碰即响应
             const btn = document.getElementById('awaken-btn');
             btn.addEventListener('click', awakenGhost);
             btn.addEventListener('touchstart', (e) => { e.preventDefault(); awakenGhost(); }, { passive: false });
-            
             animate();
         }
 
@@ -179,9 +179,7 @@
             for (let i = 0; i < 5500; i++) {
                 const baseX = pos[i*18 + 0]; const z = pos[i*18 + 2];
                 const wind = Math.sin(time * 1.5 + z * 0.2); const mouseAvoid = gardenActive ? mouse.x * 1.5 : 0; const totalOffset = wind + mouseAvoid;
-                pos[i*18 + 3] = baseX + totalOffset * 0.08; pos[i*18 + 6] = baseX + totalOffset * 0.08;
-                pos[i*18 + 9] = baseX + totalOffset * 0.3;  pos[i*18 + 12] = baseX + totalOffset * 0.3;
-                pos[i*18 + 15] = baseX + totalOffset * 0.8;
+                pos[i*18 + 3] = baseX + totalOffset * 0.08; pos[i*18 + 9] = baseX + totalOffset * 0.3; pos[i*18 + 15] = baseX + totalOffset * 0.8;
             }
             linesGrass.geometry.attributes.position.needsUpdate = true;
         }
@@ -215,7 +213,6 @@
             if (inputVal === "0203") {
                 const uniqueColor = new THREE.Color().setHSL(0.645, 0.45, 0.8);
                 ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; colorDesc = "月光浸染的丹宁蓝频段"; phaseName = "暗物质瓷"; finalHue = 0.645;
-                // ⚠️ 修复 4：0203 宽度压窄 10%
                 targetScale.x = (1.3 + (month / 12) * 3.0) * 0.9;
             } else {
                 let rawHue = ((calcMonth - 1) * 31 + calcDay) % 360; if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360;
@@ -232,7 +229,8 @@
             ghostMaterial.needsUpdate = true; targetScale.y = 1.3 + (day / 31) * 3.5; targetScale.z = targetScale.x; metalFlower.visible = true; isAwakening = true; document.getElementById('ui-layer').style.opacity = '0'; setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500);
             document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：${phaseName} | 色谱：${colorDesc} ]`;
             document.getElementById('ghost-oracle').innerHTML = generateOracle(month, day, finalHue, phaseName);
-            document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是一个时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
+            // ⚠️ 修正文案：删除“一个”
+            document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
             document.getElementById('ghost-info').style.opacity = '1'; gardenActive = true; startOracleTimer();
         }
         document.getElementById('bday-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') awakenGhost(); }); init3D();
