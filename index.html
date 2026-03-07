@@ -92,23 +92,24 @@
             will-change: transform, opacity, filter, letter-spacing;
         }
 
-        /* 坐标单行高亮 */
         .ghost-header {
             font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); 
             font-family: monospace; letter-spacing: 2px; font-weight: 400; 
             white-space: nowrap; 
         }
         
-        /* ⚠️ 修复 3：通过 nowrap 强制整体不换行，配合内部唯一的一个 <br> 确保严格两行，不再分家 */
         #ghost-oracle {
             font-size: clamp(9.5px, 2.6vw, 13px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; 
             line-height: 2.0; white-space: nowrap;
         }
 
+        /* ⚠️ 修复 3：开启事件穿透（pointer-events: auto），使箴言可以被点击重置时间 */
         #ghost-quote {
             font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; 
             display: none; opacity: 0; font-style: italic; line-height: 1.9;
+            pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease;
         }
+        #ghost-quote:active { opacity: 0.5; }
 
         @keyframes windDissolve {
             0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; }
@@ -151,7 +152,7 @@
             <div class="ghost-header" id="ghost-coord"></div>
             <div id="ghost-oracle"></div>
         </div>
-        <div id="ghost-quote">
+        <div id="ghost-quote" onclick="restoreOracle()">
             <div style="display:block; white-space:nowrap; padding-bottom:2px;">“我们如今仿佛对镜观看，模糊不清，到那时就要面对面了，</div>
             <div style="display:block; white-space:nowrap;">我如今所知道的有限，到那时就全知道，如同造物主知道我一样。”</div>
         </div>
@@ -175,7 +176,9 @@
         let targetScale = { x: 2.5, y: 2.5, z: 2.5 };
         let heartBase = 1.0, heartSub = 0.5;
 
-        // ⚠️ 修复 3：极其简练、深邃的解读词重写（字数大减，确保单行排下）
+        // ⚠️ 修复 2：交互计时器全局变量
+        let animTimer1, animTimer2;
+
         function generateOracle(month, day) {
             let spiritualBase = "";
             if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) spiritualBase = "散发纯粹的初生动能，以不可驯服的锐度撕裂平庸";
@@ -198,8 +201,7 @@
             const hashA = (month * 17 + day * 23) % 10;
             const hashB = (month * 31 + day * 13) % 10;
             
-            // 加入唯一的 <br>，配合 CSS nowrap 实现严丝合缝的两行
-            return `你的 Ghost ${spiritualBase}。<br>正${actions[hashA]}${objects[hashB]}，彰显躯壳外绝对的独特性。`;
+            return `<div style="display:block; padding-bottom:4px;">你的 Ghost ${spiritualBase}。</div><div style="display:block;">正${actions[hashA]}${objects[hashB]}，彰显躯壳外绝对的独特性。</div>`;
         }
 
         function init3D() {
@@ -243,9 +245,8 @@
             linesGrass = new THREE.LineSegments(linesGeometry, linesMaterial);
             scene.add(linesGrass);
 
-            // ⚠️ 修复 4：极其简化的纯白渐变，不带任何其他色阶
             const canvas = document.createElement('canvas');
-            canvas.width = 32; canvas.height = 32; // 使用更小的画板，减少渲染负担和插值失真
+            canvas.width = 32; canvas.height = 32; 
             const context = canvas.getContext('2d');
             const gradient = context.createRadialGradient(16, 16, 0, 16, 16, 16);
             gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
@@ -258,11 +259,10 @@
             for(let i = 0; i < 140; i++) { 
                 bokehPositions[i*3] = (Math.random() - 0.5) * 35; 
                 bokehPositions[i*3+1] = (Math.random() - 0.5) * 35; 
-                bokehPositions[i*3+2] = Math.random() * 12 - 10; // Z轴安全结界
+                bokehPositions[i*3+2] = Math.random() * 12 - 10; 
             }
             bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPositions, 3));
             
-            // ⚠️ 修复 4：开启 depthTest: false 彻底关掉粒子与花朵的深度像素冲突，根除彩色噪点
             const bokehMaterial = new THREE.PointsMaterial({ 
                 color: 0xffffff, size: window.innerWidth < 768 ? 6 : 10, 
                 sizeAttenuation: false, transparent: true, opacity: 0.8, 
@@ -383,6 +383,45 @@
             document.getElementById('bday-input').focus();
         }
 
+        // ⚠️ 修复 2 & 3：抽取计时器逻辑，实现可重复调用的时间流逝
+        function startOracleTimer() {
+            clearTimeout(animTimer1);
+            clearTimeout(animTimer2);
+            
+            const oracleGroup = document.getElementById('oracle-group');
+            const quoteEl = document.getElementById('ghost-quote');
+            
+            // 延长为 15 秒后触发溶解
+            animTimer1 = setTimeout(() => {
+                oracleGroup.classList.add('dissolve-anim');
+                
+                animTimer2 = setTimeout(() => {
+                    oracleGroup.style.display = 'none';
+                    quoteEl.style.display = 'block';
+                    quoteEl.classList.add('fade-in-anim');
+                }, 2500);
+                
+            }, 15000); 
+        }
+
+        // ⚠️ 修复 3：点击箴言重置时间的交互函数
+        function restoreOracle() {
+            const oracleGroup = document.getElementById('oracle-group');
+            const quoteEl = document.getElementById('ghost-quote');
+            
+            // 隐藏箴言
+            quoteEl.style.display = 'none';
+            quoteEl.classList.remove('fade-in-anim');
+            
+            // 重置并显示解读词
+            oracleGroup.style.display = 'block';
+            oracleGroup.classList.remove('dissolve-anim');
+            void oracleGroup.offsetWidth; // 触发重绘重置动画
+            
+            // 重新开始 15 秒计时
+            startOracleTimer();
+        }
+
         function awakenGhost() {
             const inputVal = document.getElementById('bday-input').value;
             if(inputVal.length !== 4) { alert("请输入完整的四位数字（如 0203）"); return; }
@@ -404,20 +443,22 @@
             ghostMaterial.opacity = 1.0;
             ghostMaterial.emissiveIntensity = 0.0;
 
-            // ⚠️ 修复 1 & 2：特权通道！0203 赋予明亮丹宁蓝 + 液态金属
+            // ⚠️ 修复 1：0203 专属回归！完美重现明度 0.7 的丹宁蓝与暗物质瓷
             if (inputVal === "0203") {
-                const uniqueColor = new THREE.Color().setHSL(0.62, 0.75, 0.65); // 拉高明度与饱和度
+                // 完全复刻最初的完美版计算公式：HSL(0.6615, 0.6387, 0.7)
+                const uniqueColor = new THREE.Color().setHSL(0.6615, 0.6387, 0.7);
+                
                 ghostMaterial.color.copy(uniqueColor);
                 ghostMaterial.emissive.copy(uniqueColor);
-                ghostMaterial.metalness = 1.0;
-                ghostMaterial.roughness = 0.1; // 极度光滑，呈现液态金属
-                ghostMaterial.clearcoat = 1.0;
-                ghostMaterial.emissiveIntensity = 0.4;
+                ghostMaterial.metalness = 0.0;
+                ghostMaterial.roughness = 0.9;
+                ghostMaterial.clearcoat = 0.0;
+                ghostMaterial.emissiveIntensity = 0.3;
                 
                 ghostLight.color.copy(uniqueColor);
                 
-                colorDesc = "明亮深邃的丹宁蓝频段";
-                phaseName = "液态金属";
+                colorDesc = "深邃的丹宁蓝频段";
+                phaseName = "暗物质瓷";
                 
             } else {
                 let rawHue = ((month - 1) * 31 + day) % 360; 
@@ -518,18 +559,8 @@
 
             gardenActive = true; 
 
-            setTimeout(() => {
-                const oracleGroup = document.getElementById('oracle-group');
-                oracleGroup.classList.add('dissolve-anim');
-                
-                setTimeout(() => {
-                    oracleGroup.style.display = 'none';
-                    const quoteEl = document.getElementById('ghost-quote');
-                    quoteEl.style.display = 'block';
-                    quoteEl.classList.add('fade-in-anim');
-                }, 2500);
-
-            }, 12000); 
+            // 调用可重置的计时器启动动画
+            startOracleTimer();
         }
 
         document.getElementById('bday-input').addEventListener('keypress', function (e) {
