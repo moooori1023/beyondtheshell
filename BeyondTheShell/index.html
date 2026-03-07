@@ -9,13 +9,13 @@
             width: 100%; height: 100%; margin: 0; padding: 0; 
             overflow: hidden; background-color: #000; 
             font-family: 'PingFang SC', 'Helvetica Neue', 'Hiragino Sans GB', sans-serif; color: #fff; 
-            /* 阻止移动端滑动产生的默认行为 */
             touch-action: none;
         }
         
+        /* ⚠️ 修复：不再使用被墙的 ImgBB 链接，改为直接读取 GitHub 里的 bg.jpg */
         #bg-image {
             position: fixed; top: -5%; left: -5%; width: 110vw; height: 110vh;
-            background-image: url('https://i.ibb.co/FbYJsCKs/IMG-5320.jpg'); 
+            background-image: url('bg.jpg'); 
             background-size: cover; background-position: center bottom;
             z-index: 0; 
         }
@@ -39,7 +39,6 @@
             z-index: 10; transition: opacity 1.5s ease;
         }
 
-        /* ⚠️ 修复 3 & 4：全面引入 clamp 响应式流体字体，适配所有视窗大小 */
         #intro-box {
             text-align: center; width: 90%; max-width: 520px; padding: 0;
             margin-bottom: clamp(20px, 5vh, 40px);
@@ -90,7 +89,6 @@
             width: 90%; max-width: 750px;
         }
         
-        /* ⚠️ 修复 2：坐标与解析词被打入同一个组，共同消散 */
         #oracle-group {
             will-change: transform, opacity, filter, letter-spacing;
         }
@@ -155,7 +153,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     
     <script>
         window.onload = () => { document.getElementById('fade-in-overlay').style.opacity = '0'; }
@@ -277,7 +275,6 @@
             const skyLight = new THREE.DirectionalLight(0xaaccff, 1.2); skyLight.position.set(5, 10, -5); scene.add(skyLight);
             const frontLight = new THREE.DirectionalLight(0xffffff, 1.5); frontLight.position.set(0, 2, 10); scene.add(frontLight);
 
-            // ⚠️ 修复 4：全面加入手机端 touch 触摸监听，确保花朵在移动端交互不丢失
             window.addEventListener('mousemove', (event) => {
                 mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
                 mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -427,12 +424,10 @@
 
             gardenActive = true; 
 
-            // ⚠️ 修复 1 & 2：整整 12秒 后，整个文本容器(包括坐标第一行)一同消散
             setTimeout(() => {
                 const oracleGroup = document.getElementById('oracle-group');
                 oracleGroup.classList.add('dissolve-anim');
                 
-                // 等待消散动画彻底飞散完 (2.5秒)，然后彻底隐藏，淡入箴言
                 setTimeout(() => {
                     oracleGroup.style.display = 'none';
                     const quoteEl = document.getElementById('ghost-quote');
