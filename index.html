@@ -12,7 +12,6 @@
             touch-action: none;
         }
         
-        /* ⚠️ 修复 3：选项C 物理回收，不再放大110%，还原100%画幅，找回左右风景 */
         #bg-image {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: url('bg.jpg'); 
@@ -93,20 +92,19 @@
             will-change: transform, opacity, filter, letter-spacing;
         }
 
-        /* ⚠️ 修复 2：坐标高亮纯白，强制单行 */
+        /* 坐标单行高亮 */
         .ghost-header {
             font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); 
             font-family: monospace; letter-spacing: 2px; font-weight: 400; 
             white-space: nowrap; 
         }
         
-        /* ⚠️ 修复 2：解析词彻底解开强制单行，靠内部标签换行，保证阅读连贯 */
+        /* ⚠️ 修复 3：通过 nowrap 强制整体不换行，配合内部唯一的一个 <br> 确保严格两行，不再分家 */
         #ghost-oracle {
-            font-size: clamp(10.5px, 2.8vw, 13.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; 
-            line-height: 1.9;
+            font-size: clamp(9.5px, 2.6vw, 13px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; 
+            line-height: 2.0; white-space: nowrap;
         }
 
-        /* ⚠️ 修复 2：箴言大幅提亮，字号缩微匹配双行极限界限，纯白高亮 */
         #ghost-quote {
             font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; 
             display: none; opacity: 0; font-style: italic; line-height: 1.9;
@@ -177,30 +175,31 @@
         let targetScale = { x: 2.5, y: 2.5, z: 2.5 };
         let heartBase = 1.0, heartSub = 0.5;
 
+        // ⚠️ 修复 3：极其简练、深邃的解读词重写（字数大减，确保单行排下）
         function generateOracle(month, day) {
             let spiritualBase = "";
-            if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) spiritualBase = "散发着不可驯服的初生动能，以一种原始而纯粹的锐度撕裂平庸";
-            else if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) spiritualBase = "沉淀着缓慢而绝对的物理秩序，在虚无中构筑起坚定的重力场";
-            else if ((month === 5 && day >= 21) || (month === 6 && day <= 21)) spiritualBase = "游离于多维度的流转与折射中，维持着无法被系统锁定的叠加态";
-            else if ((month === 6 && day >= 22) || (month === 7 && day <= 22)) spiritualBase = "在隐秘的引力场中包裹着极度柔软的内核，孵化着深邃的感知";
-            else if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) spiritualBase = "散发着不容忽视的绝对辐射，以一种燃烧的姿态确立着自我坐标";
-            else if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) spiritualBase = "剥离了所有冗余与杂念，向内坍缩成极度精密、近乎苛刻的纯粹逻辑";
-            else if ((month === 9 && day >= 23) || (month === 10 && day <= 23)) spiritualBase = "在失衡的系统荒原上，以极其优雅的张力维系着力学的绝对对称";
-            else if ((month === 10 && day >= 24) || (month === 11 && day <= 22)) spiritualBase = "潜伏于不可见的深渊底层，酝酿着能够刺透表象、带来彻底重构的锐度";
-            else if ((month === 11 && day >= 23) || (month === 12 && day <= 21)) spiritualBase = "拒绝被固定在已知坐标系中，展现出向着未知维度不断延展的矢量特征";
-            else if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) spiritualBase = "在漫长的时间刻度里缓慢结晶，以绝对的理性筑起抵御虚无的骨骼";
-            else if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) spiritualBase = "如穿行在数字季风中的逆行者，以独立且游离的波段悬浮在常规介质之外";
-            else if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) spiritualBase = "将边界彻底消融于无形，对极其微弱的数据波纹产生着高度同频的涟漪";
-            else spiritualBase = "在数字洪流中静默生长，以不可名状的姿态完成了存在参数的自洽";
+            if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) spiritualBase = "散发纯粹的初生动能，以不可驯服的锐度撕裂平庸";
+            else if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) spiritualBase = "沉淀着绝对的物理秩序，在虚无中构筑坚定的重力场";
+            else if ((month === 5 && day >= 21) || (month === 6 && day <= 21)) spiritualBase = "游离于多维度的折射中，维持无法被系统锁定的叠加态";
+            else if ((month === 6 && day >= 22) || (month === 7 && day <= 22)) spiritualBase = "包裹着极度柔软的内核，在隐秘的引力场中孵化感知";
+            else if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) spiritualBase = "散发不容忽视的绝对辐射，以燃烧的姿态确立自我坐标";
+            else if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) spiritualBase = "剥离冗余与杂念，向内坍缩成近乎苛刻的纯粹逻辑";
+            else if ((month === 9 && day >= 23) || (month === 10 && day <= 23)) spiritualBase = "在失衡的系统荒原上，以极度优雅的张力维系绝对对称";
+            else if ((month === 10 && day >= 24) || (month === 11 && day <= 22)) spiritualBase = "潜伏于不可见的深渊，酝酿着刺透表象的重构之力";
+            else if ((month === 11 && day >= 23) || (month === 12 && day <= 21)) spiritualBase = "拒绝被固定于已知坐标，向着未知维度延展出孤独矢量";
+            else if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) spiritualBase = "在漫长时间里缓慢结晶，以绝对的理性筑起抵御虚无的骨骼";
+            else if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) spiritualBase = "如数字季风中的逆行者，悬浮在常规介质之外的清醒波段";
+            else if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) spiritualBase = "将边界消融于无形，对极其微弱的数据波纹产生高度同频";
+            else spiritualBase = "在数字洪流中静默生长，以不可名状的姿态完成参数自洽";
 
-            const actions = ["静默地注视着", "从容地游离于", "温柔地解析着", "孤独地贯穿了", "坚韧地重塑着", "敏锐地捕捉着", "冷眼旁观着", "深刻地刻画着", "轻盈地越过了", "无声地沉潜入"];
-            const objects = ["被算法定义的既定宿命", "喧嚣且无序的数字洪流", "物理世界的时间枷锁", "周遭环境的微妙震荡", "趋于同质化的系统法则", "不被察觉的微观情绪", "残缺却真实的自我边界", "逻辑背后的幽暗深海", "绝对理性的冰冷壁垒", "生命体最原始的波纹"];
+            const actions = ["静默注视着", "从容游离于", "温柔解析着", "孤独贯穿了", "坚韧重塑着", "敏锐捕捉着", "冷眼旁观着", "深刻刻画着", "轻盈越过了", "无声沉潜入"];
+            const objects = ["既定的宿命", "喧嚣的洪流", "时间的枷锁", "微观的震荡", "同质的法则", "隐秘的情绪", "自我的边界", "幽暗的深海", "理性的壁垒", "原始的波纹"];
             
             const hashA = (month * 17 + day * 23) % 10;
             const hashB = (month * 31 + day * 13) % 10;
             
-            // ⚠️ 修复 2：将两句话放在两个独立的块里，句子之间绝对断开，句子内部允许极窄屏自然换行
-            return `<div style="display:block; padding-bottom:4px;">你的 Ghost ${spiritualBase}。</div><div style="display:block;">正${actions[hashA]}${objects[hashB]}，呈现出躯壳之外绝对的精神独特性。</div>`;
+            // 加入唯一的 <br>，配合 CSS nowrap 实现严丝合缝的两行
+            return `你的 Ghost ${spiritualBase}。<br>正${actions[hashA]}${objects[hashB]}，彰显躯壳外绝对的独特性。`;
         }
 
         function init3D() {
@@ -213,7 +212,6 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
 
-            // 为玻璃/镜面等物理材质生成环境贴图
             const envCanvas = document.createElement('canvas');
             envCanvas.width = 64; envCanvas.height = 64;
             const envCtx = envCanvas.getContext('2d');
@@ -225,7 +223,6 @@
             envMap.mapping = THREE.EquirectangularReflectionMapping;
             scene.environment = envMap;
 
-            // 草地：保持宽度足够，防止切断
             const grassWidth = 80, grassDepth = 50, lineCount = 5500;
             const linesGeometry = new THREE.BufferGeometry();
             const positions = new Float32Array(lineCount * 18); 
@@ -246,32 +243,30 @@
             linesGrass = new THREE.LineSegments(linesGeometry, linesMaterial);
             scene.add(linesGrass);
 
-            // ⚠️ 修复 1：纯净粒子画板，根除彩色噪点
+            // ⚠️ 修复 4：极其简化的纯白渐变，不带任何其他色阶
             const canvas = document.createElement('canvas');
-            canvas.width = 64; canvas.height = 64; 
+            canvas.width = 32; canvas.height = 32; // 使用更小的画板，减少渲染负担和插值失真
             const context = canvas.getContext('2d');
-            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+            const gradient = context.createRadialGradient(16, 16, 0, 16, 16, 16);
             gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
             gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            context.fillStyle = gradient; context.fillRect(0, 0, 64, 64);
+            context.fillStyle = gradient; context.fillRect(0, 0, 32, 32);
             const particleTexture = new THREE.CanvasTexture(canvas);
 
             const bokehGeometry = new THREE.BufferGeometry();
             const bokehPositions = new Float32Array(140 * 3);
             for(let i = 0; i < 140; i++) { 
-                bokehPositions[i*3] = (Math.random() - 0.5) * 35; // x
-                bokehPositions[i*3+1] = (Math.random() - 0.5) * 35; // y
-                // ⚠️ 修复 1：Z轴结界，锁定在 -10 到 2 之间，永远不贴镜头，恢复近大远小
-                bokehPositions[i*3+2] = Math.random() * 12 - 10; 
+                bokehPositions[i*3] = (Math.random() - 0.5) * 35; 
+                bokehPositions[i*3+1] = (Math.random() - 0.5) * 35; 
+                bokehPositions[i*3+2] = Math.random() * 12 - 10; // Z轴安全结界
             }
             bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPositions, 3));
             
-            // ⚠️ 修复 1：保持 sizeAttenuation=true（默认），锁定纯净白色
+            // ⚠️ 修复 4：开启 depthTest: false 彻底关掉粒子与花朵的深度像素冲突，根除彩色噪点
             const bokehMaterial = new THREE.PointsMaterial({ 
-                color: 0xffffff, size: 0.45, 
-                transparent: true, opacity: 0.85, 
-                map: particleTexture, depthWrite: false, blending: THREE.AdditiveBlending 
+                color: 0xffffff, size: window.innerWidth < 768 ? 6 : 10, 
+                sizeAttenuation: false, transparent: true, opacity: 0.8, 
+                map: particleTexture, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending 
             });
             bokehParticles = new THREE.Points(bokehGeometry, bokehMaterial);
             scene.add(bokehParticles);
@@ -396,11 +391,9 @@
             const day = parseInt(inputVal.substring(2, 4));
             if(month < 1 || month > 12 || day < 1 || day > 31) { alert("坐标格式有误，请输入合法日期"); return; }
 
-            // 初始化容器参数
             let colorDesc = "";
             let phaseName = "";
             
-            // 材质全部归零初始化
             ghostMaterial.color.set('#fff');
             ghostMaterial.emissive.set('#000');
             ghostMaterial.metalness = 0.0;
@@ -411,35 +404,31 @@
             ghostMaterial.opacity = 1.0;
             ghostMaterial.emissiveIntensity = 0.0;
 
-            // ⚠️ 修复 4：绝对信仰锁定 0203
+            // ⚠️ 修复 1 & 2：特权通道！0203 赋予明亮丹宁蓝 + 液态金属
             if (inputVal === "0203") {
-                // 原汁原味的经典丹宁蓝 + 暗物质瓷
-                const uniqueColor = new THREE.Color().setHSL(0.65, 0.6, 0.4); // 原丹宁蓝比例
-                ghostMaterial.color.set('#111111');
+                const uniqueColor = new THREE.Color().setHSL(0.62, 0.75, 0.65); // 拉高明度与饱和度
+                ghostMaterial.color.copy(uniqueColor);
                 ghostMaterial.emissive.copy(uniqueColor);
-                ghostMaterial.metalness = 0.0;
-                ghostMaterial.roughness = 0.9;
-                ghostMaterial.emissiveIntensity = 0.3;
+                ghostMaterial.metalness = 1.0;
+                ghostMaterial.roughness = 0.1; // 极度光滑，呈现液态金属
+                ghostMaterial.clearcoat = 1.0;
+                ghostMaterial.emissiveIntensity = 0.4;
                 
                 ghostLight.color.copy(uniqueColor);
                 
-                colorDesc = "深邃的丹宁蓝频段";
-                phaseName = "暗物质瓷";
+                colorDesc = "明亮深邃的丹宁蓝频段";
+                phaseName = "液态金属";
                 
             } else {
-                // ⚠️ 修复 4：千人千面，低保真高级灰调与 6 大材质
                 let rawHue = ((month - 1) * 31 + day) % 360; 
-                // 彻底封杀正红与高饱和橘 (340-20度)
                 if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360; 
                 
                 const hue = rawHue / 360; 
-                // 极度克制的低饱和、低明度（蒙尘感）
                 const saturation = 0.2 + (day / 31) * 0.25; 
                 const lightness = 0.35 + (month % 3) * 0.15; 
                 
                 const uniqueColor = new THREE.Color().setHSL(hue, saturation, lightness);
 
-                // 颜色低保真文案描述
                 if (rawHue < 50) colorDesc = "生锈的琥珀金频段";
                 else if (rawHue < 80) colorDesc = "黯淡的微光绿频段";
                 else if (rawHue < 170) colorDesc = "深海的冰蓝频段";
@@ -447,17 +436,16 @@
                 else if (rawHue < 300) colorDesc = "褪色的赛博紫频段";
                 else colorDesc = "低保真的千禧粉频段";
 
-                // 6 大扩展相态
                 const phaseVal = (month * 7 + day * 11) % 6;
                 
-                if (phaseVal === 0) { // 赛博镜面银
+                if (phaseVal === 0) { 
                     ghostMaterial.color.set('#aaaaaa');
                     ghostMaterial.emissive.set('#555555');
                     ghostMaterial.metalness = 1.0;
                     ghostMaterial.roughness = 0.05;
                     phaseName = "赛博液态银";
                     ghostLight.color.set('#ffffff');
-                } else if (phaseVal === 1) { // 灵动清透水
+                } else if (phaseVal === 1) { 
                     ghostMaterial.color.set('#ffffff');
                     ghostMaterial.transmission = 0.95;
                     ghostMaterial.ior = 1.33; 
@@ -466,7 +454,7 @@
                     ghostMaterial.clearcoat = 0.8;
                     phaseName = "灵动水态";
                     ghostLight.color.copy(uniqueColor);
-                } else if (phaseVal === 2) { // 晶莹高折射玻璃
+                } else if (phaseVal === 2) { 
                     ghostMaterial.color.set('#ffffff');
                     ghostMaterial.transmission = 0.98;
                     ghostMaterial.ior = 1.55; 
@@ -475,7 +463,7 @@
                     ghostMaterial.clearcoat = 1.0;
                     phaseName = "高折射琉璃";
                     ghostLight.color.copy(uniqueColor);
-                } else if (phaseVal === 3) { // 暗哑金属
+                } else if (phaseVal === 3) { 
                     ghostMaterial.color.copy(uniqueColor);
                     ghostMaterial.metalness = 0.8;
                     ghostMaterial.roughness = 0.5;
@@ -483,7 +471,7 @@
                     ghostMaterial.emissiveIntensity = 0.2;
                     phaseName = "哑光钛素";
                     ghostLight.color.copy(uniqueColor);
-                } else if (phaseVal === 4) { // 低保真磨砂透体
+                } else if (phaseVal === 4) { 
                     ghostMaterial.color.copy(uniqueColor);
                     ghostMaterial.metalness = 0.2;
                     ghostMaterial.roughness = 0.6;
@@ -492,7 +480,7 @@
                     ghostMaterial.emissiveIntensity = 0.4;
                     phaseName = "色散雾化晶体";
                     ghostLight.color.copy(uniqueColor);
-                } else { // 经典暗物质瓷（保留选项）
+                } else { 
                     ghostMaterial.color.set('#1a1a1a');
                     ghostMaterial.emissive.copy(uniqueColor);
                     ghostMaterial.metalness = 0.0;
