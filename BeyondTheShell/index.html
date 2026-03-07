@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>躯壳之外 | 觉醒数字花园</title>
+    <style>
+        html, body { 
+            width: 100%; height: 100%; margin: 0; padding: 0; 
+            overflow: hidden; background-color: #000; 
+            font-family: 'PingFang SC', 'Helvetica Neue', 'Hiragino Sans GB', sans-serif; color: #fff; 
+            /* 阻止移动端滑动产生的默认行为 */
+            touch-action: none;
+        }
+        
+        #bg-image {
+            position: fixed; top: -5%; left: -5%; width: 110vw; height: 110vh;
+            background-image: url('https://i.ibb.co/FbYJsCKs/IMG-5320.jpg'); 
+            background-size: cover; background-position: center bottom;
+            z-index: 0; 
+        }
+
+        canvas { 
+            display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            z-index: 1; pointer-events: none; 
+        }
+
+        #glass-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(10, 15, 20, 0.45); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 5; transition: opacity 2.5s ease; pointer-events: none;
+        }
+
+        #ui-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10; transition: opacity 1.5s ease;
+        }
+
+        /* ⚠️ 修复 3 & 4：全面引入 clamp 响应式流体字体，适配所有视窗大小 */
+        #intro-box {
+            text-align: center; width: 90%; max-width: 520px; padding: 0;
+            margin-bottom: clamp(20px, 5vh, 40px);
+        }
+        #intro-box h1 {
+            font-size: clamp(16px, 4vw, 20px); font-weight: 400; letter-spacing: 5px; 
+            margin-bottom: 15px; color: #fff; line-height: 1.4;
+        }
+        .en-title {
+            display: block; font-size: clamp(9px, 2vw, 11px); font-family: monospace; 
+            letter-spacing: 8px; color: rgba(255,255,255,0.5); margin-top: 8px; font-weight: 300;
+        }
+        #intro-box p {
+            font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; 
+            letter-spacing: 2px; color: rgba(255,255,255,0.85);
+        }
+
+        .btn-style { 
+            background: rgba(255, 255, 255, 0.9); color: #000; border: none; 
+            padding: clamp(10px, 2vh, 12px) clamp(30px, 6vw, 40px); border-radius: 30px; 
+            cursor: pointer; font-size: clamp(11px, 2.5vw, 13px); 
+            letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease; pointer-events: auto;
+        }
+        .btn-style:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.3); }
+        
+        #birthday-ui {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 1.5s ease; pointer-events: auto;
+            text-align: center; 
+        }
+
+        #bday-input {
+            background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.6);
+            color: #fff; font-size: clamp(26px, 6vw, 35px); text-align: center; 
+            width: clamp(140px, 40vw, 180px); letter-spacing: 12px;
+            outline: none; font-family: 'Courier New', Courier, monospace; font-weight: 300;
+            margin-bottom: 35px; padding-bottom: 5px; transition: border-color 0.3s ease;
+        }
+        #bday-input:focus { border-bottom: 1px solid rgba(255,255,255,1); }
+        #bday-input::placeholder { color: rgba(255,255,255,0.3); }
+
+        #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
+
+        #ghost-info {
+            position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%);
+            color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8;
+            opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none;
+            width: 90%; max-width: 750px;
+        }
+        
+        /* ⚠️ 修复 2：坐标与解析词被打入同一个组，共同消散 */
+        #oracle-group {
+            will-change: transform, opacity, filter, letter-spacing;
+        }
+
+        .ghost-header {
+            font-size: clamp(9px, 2vw, 11px); color: #ccc; margin-bottom: clamp(8px, 2vh, 12px); 
+            font-family: monospace; letter-spacing: 3px; font-weight: 300;
+        }
+        
+        #ghost-oracle {
+            font-size: clamp(11px, 2.5vw, 13px); color: #ddd; font-weight: 300; letter-spacing: 1.5px; 
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        #ghost-quote {
+            font-size: clamp(11px, 2.5vw, 13px); color: #bbb; font-weight: 300; letter-spacing: 1.5px; 
+            display: none; opacity: 0; font-style: italic; line-height: 2.0;
+        }
+
+        @keyframes windDissolve {
+            0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; }
+            100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; }
+        }
+        .dissolve-anim {
+            animation: windDissolve 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        
+        @keyframes fadeInQuote {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-anim {
+            animation: fadeInQuote 2.5s ease forwards;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="fade-in-overlay"></div>
+    <div id="bg-image"></div>
+    <div id="glass-overlay"></div>
+
+    <div id="ui-layer">
+        <div id="intro-box">
+            <h1>躯壳之外<span class="en-title">BEYOND THE SHELL</span></h1>
+            <p>这里是过滤数字噪点的私人温室。<br>请在此键入你的诞生之日（如 0203），<br>这串你在物理世界的初始时间戳，将作为唤醒的唯一密钥。</p>
+        </div>
+        <button id="dive-btn" class="btn-style" onclick="showInput()">构建密钥</button>
+        
+        <div id="birthday-ui">
+            <input type="text" id="bday-input" maxlength="4" placeholder="MMDD" autocomplete="off" pattern="\d*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+            <button id="awaken-btn" class="btn-style" onclick="awakenGhost()">唤醒 Ghost</button>
+        </div>
+    </div>
+
+    <div id="ghost-info">
+        <div id="oracle-group">
+            <div class="ghost-header" id="ghost-coord"></div>
+            <div id="ghost-oracle"></div>
+        </div>
+        <div id="ghost-quote">“我们如今仿佛对镜观看，模糊不清，到那时就要面对面了，<br>我如今所知道的有限，到那时就全知道，如同造物主知道我一样。”</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    
+    <script>
+        window.onload = () => { document.getElementById('fade-in-overlay').style.opacity = '0'; }
+
+        let scene, camera, renderer, linesGrass, metalFlower, bokehParticles;
+        const mouse = new THREE.Vector2();
+        const targetFollow = new THREE.Vector3();
+        let gardenActive = false; 
+        
+        let ghostMaterial, ghostLight; 
+        let isAwakening = false;
+        
+        let currentScale = { x: 2.5, y: 2.5, z: 2.5 };
+        let targetScale = { x: 2.5, y: 2.5, z: 2.5 };
+        let heartBase = 1.0, heartSub = 0.5;
+
+        function generateOracle(month, day) {
+            let spiritualBase = "";
+            if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) spiritualBase = "散发着不可驯服的初生动能，以一种原始而纯粹的锐度撕裂平庸";
+            else if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) spiritualBase = "沉淀着缓慢而绝对的物理秩序，在虚无中构筑起坚定的重力场";
+            else if ((month === 5 && day >= 21) || (month === 6 && day <= 21)) spiritualBase = "游离于多维度的流转与折射中，维持着无法被系统锁定的叠加态";
+            else if ((month === 6 && day >= 22) || (month === 7 && day <= 22)) spiritualBase = "在隐秘的引力场中包裹着极度柔软的内核，孵化着深邃的感知";
+            else if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) spiritualBase = "散发着不容忽视的绝对辐射，以一种燃烧的姿态确立着自我坐标";
+            else if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) spiritualBase = "剥离了所有冗余与杂念，向内坍缩成极度精密、近乎苛刻的纯粹逻辑";
+            else if ((month === 9 && day >= 23) || (month === 10 && day <= 23)) spiritualBase = "在失衡的系统荒原上，以极其优雅的张力维系着力学的绝对对称";
+            else if ((month === 10 && day >= 24) || (month === 11 && day <= 22)) spiritualBase = "潜伏于不可见的深渊底层，酝酿着能够刺透表象、带来彻底重构的锐度";
+            else if ((month === 11 && day >= 23) || (month === 12 && day <= 21)) spiritualBase = "拒绝被固定在已知坐标系中，展现出向着未知维度不断延展的矢量特征";
+            else if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) spiritualBase = "在漫长的时间刻度里缓慢结晶，以绝对的理性筑起抵御虚无的骨骼";
+            else if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) spiritualBase = "如穿行在数字季风中的逆行者，以独立且游离的波段悬浮在常规介质之外";
+            else if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) spiritualBase = "将边界彻底消融于无形，对极其微弱的数据波纹产生着高度同频的涟漪";
+            else spiritualBase = "在数字洪流中静默生长，以不可名状的姿态完成了存在参数的自洽";
+
+            const actions = ["静默地注视着", "从容地游离于", "温柔地解析着", "孤独地贯穿了", "坚韧地重塑着", "敏锐地捕捉着", "冷眼旁观着", "深刻地刻画着", "轻盈地越过了", "无声地沉潜入"];
+            const objects = ["被算法定义的既定宿命", "喧嚣且无序的数字洪流", "物理世界的时间枷锁", "周遭环境的微妙震荡", "趋于同质化的系统法则", "不被察觉的微观情绪", "残缺却真实的自我边界", "逻辑背后的幽暗深海", "绝对理性的冰冷壁垒", "生命体最原始的波纹"];
+            
+            const hashA = (month * 17 + day * 23) % 10;
+            const hashB = (month * 31 + day * 13) % 10;
+            
+            return `你的 Ghost ${spiritualBase}。<br>正${actions[hashA]}${objects[hashB]}，呈现出躯壳之外绝对的精神独特性。`;
+        }
+
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 1.5, 8); 
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+
+            const grassWidth = 45, grassDepth = 30, lineCount = 3500;
+            const linesGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(lineCount * 18); 
+            for (let i = 0; i < lineCount; i++) {
+                const x = Math.random() * grassWidth - grassWidth/2;
+                const z = Math.random() * grassDepth - grassDepth/2;
+                const h = 1.0 + Math.random() * 1.5;
+                const p0y = -1, p1y = -1 + h*0.33, p2y = -1 + h*0.66, p3y = -1 + h;
+                positions[i*18+0] = x; positions[i*18+1] = p0y; positions[i*18+2] = z;
+                positions[i*18+3] = x; positions[i*18+4] = p1y; positions[i*18+5] = z;
+                positions[i*18+6] = x; positions[i*18+7] = p1y; positions[i*18+8] = z;
+                positions[i*18+9] = x; positions[i*18+10]= p2y; positions[i*18+11]= z;
+                positions[i*18+12]= x; positions[i*18+13]= p2y; positions[i*18+14]= z;
+                positions[i*18+15]= x; positions[i*18+16]= p3y; positions[i*18+17]= z;
+            }
+            linesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const linesMaterial = new THREE.LineBasicMaterial({ color: 0xcceeff, transparent: true, opacity: 0.35 });
+            linesGrass = new THREE.LineSegments(linesGeometry, linesMaterial);
+            scene.add(linesGrass);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 32; canvas.height = 32;
+            const context = canvas.getContext('2d');
+            const gradient = context.createRadialGradient(16, 16, 0, 16, 16, 16);
+            gradient.addColorStop(0, 'rgba(255,255,255,0.85)');
+            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+            context.fillStyle = gradient; context.fillRect(0, 0, 32, 32);
+            const particleTexture = new THREE.CanvasTexture(canvas);
+
+            const bokehGeometry = new THREE.BufferGeometry();
+            const bokehPositions = new Float32Array(140 * 3);
+            for(let i = 0; i < 140 * 3; i++) { bokehPositions[i] = (Math.random() - 0.5) * 35; }
+            bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPositions, 3));
+            const bokehMaterial = new THREE.PointsMaterial({ 
+                color: 0xffeebb, size: 0.35, transparent: true, opacity: 0.85, 
+                map: particleTexture, depthWrite: false, blending: THREE.AdditiveBlending 
+            });
+            bokehParticles = new THREE.Points(bokehGeometry, bokehMaterial);
+            bokehParticles.position.z = -5;
+            scene.add(bokehParticles);
+
+            ghostMaterial = new THREE.MeshPhysicalMaterial({ 
+                color: 0xffffff, metalness: 0.9, roughness: 0.1, emissive: 0xffffff, emissiveIntensity: 0.1,
+                transparent: true, opacity: 1.0, side: THREE.DoubleSide
+            });
+
+            const objLoader = new THREE.OBJLoader();
+            objLoader.load('flower.obj', function (object) {
+                object.traverse(function (child) { if (child.isMesh) child.material = ghostMaterial; });
+                const box = new THREE.Box3().setFromObject(object);
+                const center = box.getCenter(new THREE.Vector3());
+                object.position.sub(center); 
+                
+                const wrapper = new THREE.Group();
+                wrapper.add(object);
+                wrapper.scale.set(currentScale.x, currentScale.y, currentScale.z); 
+                wrapper.position.y = 1.5; 
+                metalFlower = wrapper;
+                
+                metalFlower.visible = false; 
+                scene.add(metalFlower);
+            });
+
+            ghostLight = new THREE.PointLight(0xffffff, 0, 12);
+            scene.add(ghostLight);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const skyLight = new THREE.DirectionalLight(0xaaccff, 1.2); skyLight.position.set(5, 10, -5); scene.add(skyLight);
+            const frontLight = new THREE.DirectionalLight(0xffffff, 1.5); frontLight.position.set(0, 2, 10); scene.add(frontLight);
+
+            // ⚠️ 修复 4：全面加入手机端 touch 触摸监听，确保花朵在移动端交互不丢失
+            window.addEventListener('mousemove', (event) => {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
+            window.addEventListener('touchmove', (event) => {
+                if(event.touches.length > 0) {
+                    mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+                    mouse.y = -(event.touches[0].clientY / window.innerHeight) * 2 + 1;
+                }
+            }, { passive: true });
+
+            window.addEventListener('resize', onWindowResize);
+            animate();
+        }
+
+        function updateLinesGrass(time) {
+            const positions = linesGrass.geometry.attributes.position.array;
+            for (let i = 0; i < 3500; i++) {
+                const baseX = positions[i*18 + 0]; 
+                const z = positions[i*18 + 2];
+                const wind = Math.sin(time * 1.5 + z * 0.2);
+                const mouseAvoid = gardenActive ? mouse.x * 1.5 : 0; 
+                const totalOffset = wind + mouseAvoid;
+                positions[i*18 + 3] = baseX + totalOffset * 0.08; positions[i*18 + 6] = baseX + totalOffset * 0.08;
+                positions[i*18 + 9] = baseX + totalOffset * 0.3;  positions[i*18 + 12] = baseX + totalOffset * 0.3;
+                positions[i*18 + 15] = baseX + totalOffset * 0.8;
+            }
+            linesGrass.geometry.attributes.position.needsUpdate = true;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = performance.now() * 0.001;
+
+            if(linesGrass) updateLinesGrass(time);
+            
+            if(bokehParticles) {
+                bokehParticles.rotation.y = time * 0.03 + (isAwakening ? 0.08 : 0); 
+                bokehParticles.position.y = Math.sin(time * 0.5) * 0.5;
+            }
+            
+            if(metalFlower && metalFlower.visible) { 
+                if(isAwakening) {
+                    currentScale.x += (targetScale.x - currentScale.x) * 0.06;
+                    currentScale.y += (targetScale.y - currentScale.y) * 0.06;
+                    currentScale.z += (targetScale.z - currentScale.z) * 0.06;
+                    metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z);
+                    
+                    metalFlower.rotation.y += 0.25; 
+                    metalFlower.rotation.z += 0.05;
+                    
+                    if (Math.abs(targetScale.y - currentScale.y) < 0.05) isAwakening = false;
+                } else if(gardenActive) {
+                    targetFollow.set(mouse.x * 4, mouse.y * 3 + 1.5, 5);
+                    metalFlower.lookAt(targetFollow);
+                    metalFlower.rotation.z += 0.002; 
+                } else {
+                    metalFlower.rotation.y += 0.003;
+                }
+                
+                const breathOffset = Math.sin(time * heartBase) * 0.15 + Math.sin(time * heartSub) * 0.05;
+                metalFlower.position.y = 1.5 + breathOffset;
+                
+                if(gardenActive) ghostLight.intensity = 1.5 + Math.sin(time * heartBase * 2) * 0.5;
+                ghostLight.position.copy(metalFlower.position);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function showInput() {
+            document.getElementById('intro-box').style.display = 'none';
+            document.getElementById('dive-btn').style.display = 'none';
+            
+            const bdayUI = document.getElementById('birthday-ui');
+            bdayUI.style.display = 'flex';
+            setTimeout(() => { bdayUI.style.opacity = '1'; }, 50);
+            document.getElementById('bday-input').focus();
+        }
+
+        function awakenGhost() {
+            const inputVal = document.getElementById('bday-input').value;
+            if(inputVal.length !== 4) { alert("请输入完整的四位数字（如 0203）"); return; }
+            
+            const month = parseInt(inputVal.substring(0, 2));
+            const day = parseInt(inputVal.substring(2, 4));
+            if(month < 1 || month > 12 || day < 1 || day > 31) { alert("坐标格式有误，请输入合法日期"); return; }
+
+            const hashColor = (month * 13 + day * 7) % 100; 
+            const hue = 0.45 + (hashColor / 100) * 0.45; 
+            const saturation = 0.6 + (day / 31) * 0.4; 
+            const lightness = 0.4 + (month % 3) * 0.15; 
+            const uniqueColor = new THREE.Color().setHSL(hue, saturation, lightness);
+            
+            ghostMaterial.color.copy(uniqueColor);
+            ghostMaterial.emissive.copy(uniqueColor);
+            ghostLight.color.copy(uniqueColor);
+            ghostLight.intensity = 2.0;
+
+            let colorDesc = "";
+            if (hue < 0.55) colorDesc = "理性的青蓝频段";
+            else if (hue < 0.7) colorDesc = "深邃的丹宁蓝频段";
+            else if (hue < 0.85) colorDesc = "异质的赛博紫频段";
+            else colorDesc = "低保真的千禧淡粉频段";
+
+            const phaseVal = (month * 7 + day * 11) % 3;
+            let phaseName = "";
+            if (phaseVal === 0) {
+                ghostMaterial.metalness = 1.0; ghostMaterial.roughness = 0.1; ghostMaterial.opacity = 1.0; ghostMaterial.clearcoat = 1.0; ghostMaterial.emissiveIntensity = 0.4;
+                phaseName = "液态金属"; 
+            } else if (phaseVal === 1) {
+                ghostMaterial.metalness = 0.2; ghostMaterial.roughness = 0.05; ghostMaterial.opacity = 0.4; ghostMaterial.clearcoat = 1.0; ghostMaterial.emissiveIntensity = 0.6; 
+                phaseName = "色散晶体"; 
+            } else {
+                ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; ghostMaterial.opacity = 1.0; ghostMaterial.clearcoat = 0.0; ghostMaterial.emissiveIntensity = 0.3;
+                phaseName = "暗物质瓷"; 
+            }
+            ghostMaterial.needsUpdate = true;
+
+            targetScale.x = 1.3 + (month / 12) * 3.0; 
+            targetScale.z = targetScale.x;
+            targetScale.y = 1.3 + (day / 31) * 3.5;   
+
+            heartBase = 0.8 + (day / 31) * 2.0;
+            heartSub = 1.0 + (month / 12) * 3.0;
+
+            currentScale = { x: 0.1, y: 0.1, z: 0.1 }; 
+            metalFlower.scale.set(0.1, 0.1, 0.1);
+            
+            metalFlower.visible = true;
+            isAwakening = true;
+
+            document.getElementById('glass-overlay').style.opacity = '0';
+            document.getElementById('ui-layer').style.opacity = '0';
+            setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500);
+            
+            const oracleText = generateOracle(month, day);
+            document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：${phaseName} | 色谱：${colorDesc} ]`;
+            document.getElementById('ghost-oracle').innerHTML = oracleText;
+            document.getElementById('ghost-info').style.opacity = '1';
+
+            gardenActive = true; 
+
+            // ⚠️ 修复 1 & 2：整整 12秒 后，整个文本容器(包括坐标第一行)一同消散
+            setTimeout(() => {
+                const oracleGroup = document.getElementById('oracle-group');
+                oracleGroup.classList.add('dissolve-anim');
+                
+                // 等待消散动画彻底飞散完 (2.5秒)，然后彻底隐藏，淡入箴言
+                setTimeout(() => {
+                    oracleGroup.style.display = 'none';
+                    const quoteEl = document.getElementById('ghost-quote');
+                    quoteEl.style.display = 'block';
+                    quoteEl.classList.add('fade-in-anim');
+                }, 2500);
+
+            }, 12000); 
+        }
+
+        document.getElementById('bday-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') awakenGhost();
+        });
+
+        init3D();
+    </script>
+</body>
+</html>
