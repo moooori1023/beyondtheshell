@@ -11,44 +11,120 @@
             font-family: 'PingFang SC', 'Helvetica Neue', 'Hiragino Sans GB', sans-serif; color: #fff; 
             touch-action: none;
         }
+        
         #bg-image {
             position: fixed; top: 0; left: 0; width: 100vw; height: 110vh;
             background-image: url('bg.jpg'); 
             background-size: cover; background-position: center bottom;
             z-index: 0;
         }
-        canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
+
+        canvas { 
+            display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            z-index: 1; pointer-events: none;
+        }
+
         #glass-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0, 0, 0, 0); 
-            backdrop-filter: none; -webkit-backdrop-filter: none;
+            backdrop-filter: none; 
+            -webkit-backdrop-filter: none;
             z-index: 5; transition: opacity 2.5s ease; pointer-events: none;
         }
+
         #ui-layer {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: rgba(0, 0, 0, 0.30);
             z-index: 10; transition: opacity 1.5s ease;
         }
-        #intro-box { text-align: center; width: 90%; max-width: 520px; padding: 0; margin-bottom: clamp(20px, 5vh, 40px); }
-        #intro-box h1 { font-size: clamp(16px, 4vw, 20px); font-weight: 400; letter-spacing: 5px; margin-bottom: 15px; color: #fff; line-height: 1.4; }
-        .en-title { display: block; font-size: clamp(9px, 2vw, 11px); font-family: monospace; letter-spacing: 8px; color: rgba(255,255,255,0.5); margin-top: 8px; font-weight: 300; }
-        #intro-box p { font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; letter-spacing: 2px; color: rgba(255,255,255,0.85); }
-        .btn-style { background: rgba(255, 255, 255, 0.9); color: #000; border: none; padding: clamp(10px, 2vh, 12px) clamp(30px, 6vw, 40px); border-radius: 30px; cursor: pointer; font-size: clamp(11px, 2.5vw, 13px); letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease; pointer-events: auto; }
+
+        #intro-box {
+            text-align: center; width: 90%; max-width: 520px; padding: 0;
+            margin-bottom: clamp(20px, 5vh, 40px);
+        }
+        #intro-box h1 {
+            font-size: clamp(16px, 4vw, 20px); font-weight: 400; letter-spacing: 5px; 
+            margin-bottom: 15px; color: #fff; line-height: 1.4;
+        }
+        .en-title {
+            display: block; font-size: clamp(9px, 2vw, 11px); font-family: monospace; 
+            letter-spacing: 8px; color: rgba(255,255,255,0.5); margin-top: 8px; font-weight: 300;
+        }
+        #intro-box p {
+            font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; 
+            letter-spacing: 2px; color: rgba(255,255,255,0.85);
+        }
+
+        .btn-style { 
+            background: rgba(255, 255, 255, 0.9); color: #000; border: none; 
+            padding: clamp(10px, 2vh, 12px) clamp(30px, 6vw, 40px); border-radius: 30px; 
+            cursor: pointer; font-size: clamp(11px, 2.5vw, 13px); letter-spacing: 2px; font-weight: 600; 
+            transition: all 0.4s ease; pointer-events: auto;
+        }
         .btn-style:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.3); }
-        #birthday-ui { display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; pointer-events: auto; text-align: center; }
-        #bday-input { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.6); color: #fff; font-size: clamp(26px, 6vw, 35px); text-align: center; width: clamp(140px, 40vw, 180px); letter-spacing: 12px; outline: none; font-family: 'Courier New', Courier, monospace; font-weight: 300; margin-bottom: 35px; padding-bottom: 5px; transition: border-color 0.3s ease; }
+        
+        #birthday-ui {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 1.5s ease; pointer-events: auto; text-align: center;
+        }
+
+        #bday-input {
+            background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.6);
+            color: #fff; font-size: clamp(26px, 6vw, 35px); text-align: center; 
+            width: clamp(140px, 40vw, 180px); letter-spacing: 12px; outline: none; 
+            font-family: 'Courier New', Courier, monospace; font-weight: 300;
+            margin-bottom: 35px; padding-bottom: 5px; transition: border-color 0.3s ease;
+        }
+        #bday-input:focus { border-bottom: 1px solid rgba(255,255,255,1); }
+        #bday-input::placeholder { color: rgba(255,255,255,0.3); }
+
         #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
-        #ghost-info { position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8; opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none; width: 95vw; max-width: 750px; }
+
+        #ghost-info {
+            position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%);
+            color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8;
+            opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none;
+            width: 95vw; max-width: 750px;
+        }
+        
         #oracle-group { will-change: transform, opacity, filter, letter-spacing; }
-        .ghost-header { font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); font-family: monospace; letter-spacing: 2px; font-weight: 400; white-space: nowrap; }
-        #ghost-oracle { font-size: clamp(9px, 2.6vw, 12.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; line-height: 1.5; white-space: nowrap; }
-        .ghost-footer { font-size: clamp(8px, 1.8vw, 10px); color: rgba(255,255,255,0.4); margin-top: 15px; letter-spacing: 1px; font-weight: 300; }
-        #ghost-quote { font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; display: none; opacity: 0; font-style: italic; line-height: 1.9; pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease; }
+
+        .ghost-header {
+            font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); 
+            font-family: monospace; letter-spacing: 2px; font-weight: 400; white-space: nowrap;
+        }
+        
+        /* ⚠️ 优化 2：允许移动端在逗号处自然换行 (方案 B) */
+        #ghost-oracle {
+            font-size: clamp(9.5px, 2.6vw, 13px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; 
+            line-height: 1.8; white-space: normal; word-break: keep-all; 
+            display: inline-block; width: 100%;
+        }
+
+        /* ⚠️ 优化 3：底部小字调大并增加阴影增强可读性 */
+        .ghost-footer {
+            font-size: clamp(8.5px, 1.8vw, 10px); color: rgba(255,255,255,0.55); margin-top: 15px;
+            letter-spacing: 1px; font-weight: 300; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        #ghost-quote {
+            font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; 
+            display: none; opacity: 0; font-style: italic; line-height: 1.9;
+            pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease;
+        }
         #ghost-quote:active { opacity: 0.5; }
-        @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; } 100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; } }
+
+        @keyframes windDissolve {
+            0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; }
+            100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; }
+        }
         .dissolve-anim { animation: windDissolve 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
-        @keyframes fadeInQuote { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @keyframes fadeInQuote {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .fade-in-anim { animation: fadeInQuote 2.5s ease forwards; }
     </style>
 </head>
@@ -56,6 +132,7 @@
     <div id="fade-in-overlay"></div>
     <div id="bg-image"></div>
     <div id="glass-overlay"></div>
+
     <div id="ui-layer">
         <div id="intro-box">
             <h1>躯壳之外<span class="en-title">BEYOND THE SHELL</span></h1>
@@ -67,6 +144,7 @@
             <button id="awaken-btn" class="btn-style" onclick="awakenGhost()">唤醒 Ghost</button>
         </div>
     </div>
+
     <div id="ghost-info">
         <div id="oracle-group">
             <div class="ghost-header" id="ghost-coord"></div>
@@ -90,16 +168,11 @@
         let currentScale = { x: 2.5, y: 2.5, z: 2.5 }, targetScale = { x: 2.5, y: 2.5, z: 2.5 };
         let heartBase = 1.0, heartSub = 0.5, animTimer1, animTimer2;
 
-        // ⚠️ 修复：判词生成逻辑现在动态响应实际生成的 hue 和 phaseName
         function generateOracle(month, day, hue, phaseName) {
             let partA = "";
-            
-            // 模块 A：视觉对齐逻辑
-            if (month === 2 && day === 3) {
-                partA = "在这抹月光浸染的丹宁冷冽中";
-            } else if (phaseName === "赛博液态银") {
-                partA = "映照着冰冷的金属镜面波纹";
-            } else if (phaseName === "高折射琉璃" || phaseName === "灵动水态") {
+            if (month === 2 && day === 3) partA = "在这抹月光浸染的丹宁冷冽中";
+            else if (phaseName === "赛博液态银") partA = "映照着冰冷的金属镜面波纹";
+            else if (phaseName === "高折射琉璃" || phaseName === "灵动水态") {
                 if (hue < 50/360) partA = "借由这束琥珀色琉璃的折射";
                 else if (hue < 170/360) partA = "于这片通透冰蓝的微光里";
                 else partA = "透过这层清澈异质的介质";
@@ -110,20 +183,11 @@
                 else if (hue < 300/360) partA = "于这片异质的深紫魅影中";
                 else partA = "抚过这片褪色的低保真色彩";
             }
-
-            const basesB = [
-                "寻找通向自身之途的艰难", "啄破那层宿命定义的蛋壳", "忍受着孤独季风的洗礼",
-                "穿透那些被同化的法则", "越过两极博弈的灰度地带", "在系统的缝隙中完成呼吸",
-                "抵抗着数字洪流的平庸侵蚀", "完成对既定剧本的最终背叛"
-            ];
+            const basesB = ["寻找通向自身之途的艰难", "啄破那层宿命定义的蛋壳", "忍受着孤独季风的洗礼", "穿透那些被同化的法则", "越过两极博弈的灰度地带", "在系统的缝隙中完成呼吸", "抵抗着数字洪流的平庸侵蚀", "完成对既定剧本的最终背叛"];
             const partB = basesB[(month * day) % basesB.length];
-
-            const basesC = [
-                "确立你唯一的精神主权。", "标定你躯壳外的精神原点。", "完成对自我的终极命名。",
-                "确立那串无法复刻的坐标。", "它是系统无法模拟的密钥。"
-            ];
+            const basesC = ["确立你唯一的精神主权。", "标定你躯壳外的精神原点。", "完成对自我的终极命名。", "确立那串无法复刻的坐标。", "它是系统无法模拟的密钥。"];
             const partC = basesC[day % basesC.length];
-
+            // ⚠️ 判词结构优化：通过“，”分隔，配合 white-space: normal 实现智能折行
             return `${partA}，你正${partB}，${partC}`;
         }
 
@@ -145,27 +209,18 @@
             const bokehGeometry = new THREE.BufferGeometry(); const bokehPositions = new Float32Array(140 * 3); for(let i = 0; i < 140; i++) { bokehPositions[i*3] = (Math.random() - 0.5) * 35; bokehPositions[i*3+1] = (Math.random() - 0.5) * 35; bokehPositions[i*3+2] = Math.random() * 18 - 15; }
             bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPositions, 3)); bokehParticles = new THREE.Points(bokehGeometry, new THREE.PointsMaterial({ color: 0xffffff, size: 0.35, sizeAttenuation: true, transparent: true, opacity: 0.85, map: new THREE.CanvasTexture(canvas), depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending })); scene.add(bokehParticles);
             ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
-            new THREE.OBJLoader().load('flower.obj', (o) => { o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); const box = new THREE.Box3().setFromObject(o); o.position.sub(box.getCenter(new THREE.Vector3())); const w = new THREE.Group(); w.add(o); w.scale.set(currentScale.x, currentScale.y, currentScale.z); w.position.y = 1.5; metalFlower = w; metalFlower.visible = false; scene.add(metalFlower); });
-            ghostLight = new THREE.PointLight(0xffffff, 0, 12); scene.add(ghostLight); scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            window.addEventListener('mousemove', (e) => { mouse.x = (e.clientX / window.innerWidth) * 2 - 1; mouse.y = -(e.clientY / window.innerHeight) * 2 + 1; });
-            window.addEventListener('touchmove', (e) => { if(e.touches.length > 0) { mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1; mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1; } }, { passive: true });
-            window.addEventListener('resize', onWindowResize); animate();
-        }
-
-        function updateLinesGrass(time) {
-            const positions = linesGrass.geometry.attributes.position.array;
-            for (let i = 0; i < 5500; i++) { const baseX = positions[i*18 + 0]; const z = positions[i*18 + 2]; const wind = Math.sin(time * 1.5 + z * 0.2); const mouseAvoid = gardenActive ? mouse.x * 1.5 : 0; const totalOffset = wind + mouseAvoid; positions[i*18 + 3] = baseX + totalOffset * 0.08; positions[i*18 + 6] = baseX + totalOffset * 0.08; positions[i*18 + 9] = baseX + totalOffset * 0.3; positions[i*18 + 12] = baseX + totalOffset * 0.3; positions[i*18 + 15] = baseX + totalOffset * 0.8; }
-            linesGrass.geometry.attributes.position.needsUpdate = true;
+            new THREE.OBJLoader().load('flower.obj', (o) => { o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); const box = new THREE.Box3().setFromObject(o); o.position.sub(box.getCenter(new THREE.Vector3())); const w = new THREE.Group(); w.add(o); w.scale.set(2.5,2.5,2.5); w.position.y = 1.5; metalFlower = w; metalFlower.visible = false; scene.add(metalFlower); });
+            ghostLight = new THREE.PointLight(0xffffff, 0, 12); scene.add(ghostLight); scene.add(new THREE.AmbientLight(0xffffff, 0.6)); animate();
         }
 
         function animate() {
             requestAnimationFrame(animate); const time = performance.now() * 0.001;
-            if(linesGrass) updateLinesGrass(time);
+            if(linesGrass) { const p = linesGrass.geometry.attributes.position.array; for (let i = 0; i < 5500; i++) { const z = p[i*18+2]; const w = Math.sin(time*1.5+z*0.2); const ma = gardenActive?mouse.x*1.5:0; const off = w+ma; p[i*18+3]=p[i*18+0]+off*0.08; p[i*18+9]=p[i*18+0]+off*0.3; p[i*18+15]=p[i*18+0]+off*0.8; } linesGrass.geometry.attributes.position.needsUpdate = true; }
             if(bokehParticles) { bokehParticles.rotation.y = time * 0.03 + (isAwakening ? 0.08 : 0); bokehParticles.position.y = Math.sin(time * 0.5) * 0.5; }
             if(metalFlower && metalFlower.visible) { 
-                if(isAwakening) { currentScale.x += (targetScale.x - currentScale.x) * 0.06; currentScale.y += (targetScale.y - currentScale.y) * 0.06; currentScale.z += (targetScale.z - currentScale.z) * 0.06; metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); metalFlower.rotation.y += 0.25; metalFlower.rotation.z += 0.05; if (Math.abs(targetScale.y - currentScale.y) < 0.05) isAwakening = false;
+                if(isAwakening) { currentScale.x += (targetScale.x - currentScale.x) * 0.06; currentScale.y += (targetScale.y - currentScale.y) * 0.06; currentScale.z += (targetScale.z - currentScale.z) * 0.06; metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); metalFlower.rotation.y += 0.25; if (Math.abs(targetScale.y - currentScale.y) < 0.05) isAwakening = false;
                 } else if(gardenActive) { targetFollow.set(mouse.x * 4, mouse.y * 3 + 1.5, 5); metalFlower.lookAt(targetFollow); metalFlower.rotation.z += 0.002; } else { metalFlower.rotation.y += 0.003; }
-                const breathOffset = Math.sin(time * heartBase) * 0.15 + Math.sin(time * heartSub) * 0.05; metalFlower.position.y = 1.5 + breathOffset;
+                metalFlower.position.y = 1.5 + Math.sin(time * heartBase) * 0.15 + Math.sin(time * heartSub) * 0.05;
                 if(gardenActive) ghostLight.intensity = 1.5 + Math.sin(time * heartBase * 2) * 0.5; ghostLight.position.copy(metalFlower.position);
             }
             renderer.render(scene, camera);
@@ -173,48 +228,44 @@
 
         function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
         function showInput() { document.getElementById('intro-box').style.display = 'none'; document.getElementById('dive-btn').style.display = 'none'; document.getElementById('birthday-ui').style.display = 'flex'; setTimeout(() => { document.getElementById('birthday-ui').style.opacity = '1'; }, 50); document.getElementById('bday-input').focus(); }
-        function startOracleTimer() { clearTimeout(animTimer1); clearTimeout(animTimer2); const oracleGroup = document.getElementById('oracle-group'); const quoteEl = document.getElementById('ghost-quote'); animTimer1 = setTimeout(() => { oracleGroup.classList.add('dissolve-anim'); animTimer2 = setTimeout(() => { oracleGroup.style.display = 'none'; quoteEl.style.display = 'block'; quoteEl.classList.add('fade-in-anim'); }, 2500); }, 15000); }
-        function restoreOracle() { const oracleGroup = document.getElementById('oracle-group'); const quoteEl = document.getElementById('ghost-quote'); quoteEl.style.display = 'none'; quoteEl.classList.remove('fade-in-anim'); oracleGroup.style.display = 'block'; oracleGroup.classList.remove('dissolve-anim'); void oracleGroup.offsetWidth; startOracleTimer(); }
+        function startOracleTimer() { clearTimeout(animTimer1); clearTimeout(animTimer2); const og = document.getElementById('oracle-group'); const qe = document.getElementById('ghost-quote'); animTimer1 = setTimeout(() => { og.classList.add('dissolve-anim'); animTimer2 = setTimeout(() => { og.style.display = 'none'; qe.style.display = 'block'; qe.classList.add('fade-in-anim'); }, 2500); }, 15000); }
+        function restoreOracle() { document.getElementById('ghost-quote').style.display = 'none'; document.getElementById('oracle-group').style.display = 'block'; document.getElementById('oracle-group').classList.remove('dissolve-anim'); void document.getElementById('oracle-group').offsetWidth; startOracleTimer(); }
 
         function awakenGhost() {
-            const inputVal = document.getElementById('bday-input').value;
-            if(inputVal.length !== 4) { alert("请输入完整的四位数字（如 0203）"); return; }
-            let month = parseInt(inputVal.substring(0, 2)); let day = parseInt(inputVal.substring(2, 4));
-            if(month < 1 || month > 12 || day < 1 || day > 31) { alert("坐标格式有误，请输入合法日期"); return; }
-
-            // 互换逻辑
-            let calcMonth = month, calcDay = day;
-            if (inputVal === "0101") { calcMonth = 6; calcDay = 16; }
-            else if (inputVal === "0616") { calcMonth = 1; calcDay = 1; }
-
+            const inputVal = document.getElementById('bday-input').value; if(inputVal.length !== 4) return;
+            const month = parseInt(inputVal.substring(0, 2)), day = parseInt(inputVal.substring(2, 4));
+            if(month < 1 || month > 12 || day < 1 || day > 31) return;
+            let calcMonth = month, calcDay = day; if (inputVal === "0101") { calcMonth = 6; calcDay = 16; } else if (inputVal === "0616") { calcMonth = 1; calcDay = 1; }
             let colorDesc = "", phaseName = "", finalHue = 0;
-            ghostMaterial.color.set('#fff'); ghostMaterial.emissive.set('#000'); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.5; ghostMaterial.transmission = 0.0; ghostMaterial.ior = 1.5; ghostMaterial.thickness = 0.0; ghostMaterial.clearcoat = 0.0; ghostMaterial.opacity = 1.0; ghostMaterial.emissiveIntensity = 0.0;
+            ghostMaterial.color.set('#fff'); ghostMaterial.emissive.set('#000'); ghostMaterial.metalness = 0; ghostMaterial.roughness = 0.5; ghostMaterial.transmission = 0; ghostMaterial.ior = 1.5; ghostMaterial.thickness = 0; ghostMaterial.opacity = 1;
 
             if (inputVal === "0203") {
                 const uniqueColor = new THREE.Color().setHSL(0.645, 0.45, 0.8);
                 ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; colorDesc = "月光浸染的丹宁蓝频段"; phaseName = "暗物质瓷"; finalHue = 0.645;
+                // ⚠️ 修正 1：0203 宽度压窄 20%
+                targetScale.x = (1.3 + (month / 12) * 3.0) * 0.8;
             } else {
                 let rawHue = ((calcMonth - 1) * 31 + calcDay) % 360; if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360;
                 finalHue = rawHue / 360; const saturation = 0.2 + (calcDay / 31) * 0.25; const lightness = 0.35 + (calcMonth % 3) * 0.15; const uniqueColor = new THREE.Color().setHSL(finalHue, saturation, lightness);
                 if (rawHue < 50) colorDesc = "生锈的琥珀金频段"; else if (rawHue < 80) colorDesc = "黯淡的微光绿频段"; else if (rawHue < 170) colorDesc = "深海的冰蓝频段"; else if (rawHue < 250) colorDesc = "哑光的丹宁频段"; else if (rawHue < 300) colorDesc = "褪色的赛博紫频段"; else colorDesc = "低保真的千禧粉频段";
                 const phaseVal = (calcMonth * 7 + calcDay * 11) % 6;
                 ghostMaterial.opacity = 1.0;
-                if (phaseVal === 0) { ghostMaterial.color.set('#aaaaaa'); ghostMaterial.emissive.set('#555555'); ghostMaterial.metalness = 1.0; ghostMaterial.roughness = 0.05; phaseName = "赛博液态银"; ghostLight.color.set('#ffffff'); ghostLight.intensity = 2.0;
-                } else if (phaseVal === 1) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 0.6; ghostMaterial.ior = 1.33; ghostMaterial.roughness = 0.1; ghostMaterial.thickness = 1.5; phaseName = "灵动水态"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 0.5;
-                } else if (phaseVal === 2) { ghostMaterial.color.copy(uniqueColor).multiplyScalar(0.4); ghostMaterial.transmission = 0.7; ghostMaterial.ior = 1.55; ghostMaterial.roughness = 0.02; ghostMaterial.thickness = 2.0; ghostMaterial.attenuationColor = uniqueColor; ghostMaterial.attenuationDistance = 0.5; phaseName = "高折射琉璃"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 0.4;
-                } else if (phaseVal === 3) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.metalness = 0.8; ghostMaterial.roughness = 0.5; ghostMaterial.emissive.copy(uniqueColor); phaseName = "哑光钛素"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0;
-                } else if (phaseVal === 4) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.metalness = 0.2; ghostMaterial.roughness = 0.6; ghostMaterial.transmission = 0.4; phaseName = "色散雾化晶体"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 1.0;
-                } else { ghostMaterial.color.set('#1a1a1a'); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; phaseName = "暗物质瓷"; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; }
+                if (phaseVal === 0) { ghostMaterial.color.set('#aaaaaa'); ghostMaterial.metalness = 1.0; ghostMaterial.roughness = 0.05; phaseName = "赛博液态银"; ghostLight.color.set('#ffffff');
+                } else if (phaseVal === 1) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 0.6; ghostMaterial.ior = 1.33; ghostMaterial.thickness = 1.5; phaseName = "灵动水态";
+                } else if (phaseVal === 2) { ghostMaterial.color.copy(uniqueColor).multiplyScalar(0.4); ghostMaterial.transmission = 0.7; ghostMaterial.ior = 1.55; ghostMaterial.thickness = 2.0; ghostMaterial.attenuationColor = uniqueColor; ghostMaterial.attenuationDistance = 0.5; phaseName = "高折射琉璃"; ghostLight.intensity = 0.4;
+                } else if (phaseVal === 3) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.metalness = 0.8; ghostMaterial.roughness = 0.5; phaseName = "哑光钛素";
+                } else if (phaseVal === 4) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.metalness = 0.2; ghostMaterial.roughness = 0.6; ghostMaterial.transmission = 0.4; phaseName = "色散雾化晶体";
+                } else { ghostMaterial.color.set('#1a1a1a'); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.roughness = 0.9; phaseName = "暗物质瓷"; }
+                ghostLight.color.copy(uniqueColor); if(phaseVal!==2) ghostLight.intensity = 2.0;
+                targetScale.x = 1.3 + (month / 12) * 3.0;
             }
-            ghostMaterial.needsUpdate = true; targetScale.x = 1.3 + (month / 12) * 3.0; targetScale.y = 1.3 + (day / 31) * 3.5; metalFlower.visible = true; isAwakening = true; document.getElementById('ui-layer').style.opacity = '0'; setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500);
-            
-            // ⚠️ 核心修复：调用 generateOracle 时传入 finalHue 和 phaseName 确保文字对齐视觉
+            ghostMaterial.needsUpdate = true; targetScale.y = 1.3 + (day / 31) * 3.5; metalFlower.visible = true; isAwakening = true; document.getElementById('ui-layer').style.opacity = '0'; setTimeout(() => document.getElementById('ui-layer').style.display = 'none', 1500);
             document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：${phaseName} | 色谱：${colorDesc} ]`;
             document.getElementById('ghost-oracle').innerHTML = generateOracle(month, day, finalHue, phaseName);
             document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是一个时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
             document.getElementById('ghost-info').style.opacity = '1'; gardenActive = true; startOracleTimer();
         }
-        document.getElementById('bday-input').addEventListener('keypress', function (e) { if (e.key === 'Enter') awakenGhost(); }); init3D();
+        document.getElementById('bday-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') awakenGhost(); }); init3D();
     </script>
 </body>
 </html>
