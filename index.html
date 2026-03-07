@@ -11,571 +11,256 @@
             font-family: 'PingFang SC', 'Helvetica Neue', 'Hiragino Sans GB', sans-serif; color: #fff; 
             touch-action: none;
         }
-        
         #bg-image {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: url('bg.jpg'); 
             background-size: cover; background-position: center bottom;
             z-index: 0; 
         }
-
-        canvas { 
-            display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            z-index: 1; pointer-events: none; 
-        }
-
+        canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
         #glass-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(10, 15, 20, 0.45); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             z-index: 5; transition: opacity 2.5s ease; pointer-events: none;
         }
-
         #ui-layer {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 10; transition: opacity 1.5s ease;
         }
-
-        #intro-box {
-            text-align: center; width: 90%; max-width: 520px; padding: 0;
-            margin-bottom: clamp(20px, 5vh, 40px);
-        }
-        #intro-box h1 {
-            font-size: clamp(16px, 4vw, 20px); font-weight: 400; letter-spacing: 5px; 
-            margin-bottom: 15px; color: #fff; line-height: 1.4;
-        }
-        .en-title {
-            display: block; font-size: clamp(9px, 2vw, 11px); font-family: monospace; 
-            letter-spacing: 8px; color: rgba(255,255,255,0.5); margin-top: 8px; font-weight: 300;
-        }
-        #intro-box p {
-            font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; 
-            letter-spacing: 2px; color: rgba(255,255,255,0.85);
-        }
-
+        #intro-box { text-align: center; width: 90%; max-width: 520px; margin-bottom: 40px; }
+        #intro-box h1 { font-size: clamp(16px, 4vw, 20px); font-weight: 400; letter-spacing: 5px; margin-bottom: 15px; }
+        .en-title { display: block; font-size: 10px; font-family: monospace; letter-spacing: 8px; color: rgba(255,255,255,0.5); margin-top: 8px; }
+        #intro-box p { font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; letter-spacing: 2px; color: rgba(255,255,255,0.8); }
         .btn-style { 
-            background: rgba(255, 255, 255, 0.9); color: #000; border: none; 
-            padding: clamp(10px, 2vh, 12px) clamp(30px, 6vw, 40px); border-radius: 30px; 
-            cursor: pointer; font-size: clamp(11px, 2.5vw, 13px); 
-            letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease; pointer-events: auto;
+            background: rgba(255, 255, 255, 0.9); color: #000; border: none; padding: 12px 40px; border-radius: 30px; 
+            cursor: pointer; font-size: 13px; letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease;
         }
-        .btn-style:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.3); }
-        
-        #birthday-ui {
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 1.5s ease; pointer-events: auto;
-            text-align: center; 
-        }
-
+        #birthday-ui { display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; }
         #bday-input {
             background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.6);
-            color: #fff; font-size: clamp(26px, 6vw, 35px); text-align: center; 
-            width: clamp(140px, 40vw, 180px); letter-spacing: 12px;
-            outline: none; font-family: 'Courier New', Courier, monospace; font-weight: 300;
-            margin-bottom: 35px; padding-bottom: 5px; transition: border-color 0.3s ease;
+            color: #fff; font-size: 35px; text-align: center; width: 180px; letter-spacing: 12px; outline: none; margin-bottom: 35px;
         }
-        #bday-input:focus { border-bottom: 1px solid rgba(255,255,255,1); }
-        #bday-input::placeholder { color: rgba(255,255,255,0.3); }
-
         #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
-
         #ghost-info {
-            position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%);
-            color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8;
-            opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none;
-            width: 95vw; max-width: 750px;
+            position: fixed; bottom: 5vh; left: 50%; transform: translateX(-50%);
+            color: rgba(255,255,255,0.9); text-align: center; opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none; width: 95vw;
         }
-        
-        #oracle-group {
-            will-change: transform, opacity, filter, letter-spacing;
-        }
-
-        .ghost-header {
-            font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); 
-            font-family: monospace; letter-spacing: 2px; font-weight: 400; 
-            white-space: nowrap; 
-        }
-        
-        /* ⚠️ 修复 2：彻底瘦身后的神谕。通过 nowrap 锁定整体，依赖唯一的 <br> 换行，确保两句流动判词严格保持 2 行。 */
-        #ghost-oracle {
-            font-size: clamp(9.5px, 2.6vw, 13px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; 
-            line-height: 2.0; white-space: nowrap;
-        }
-
+        .ghost-header { font-size: 10px; color: #fff; margin-bottom: 15px; font-family: monospace; letter-spacing: 2px; white-space: nowrap; }
+        #ghost-oracle { font-size: 13px; color: #eee; font-weight: 300; letter-spacing: 1.5px; line-height: 2.2; white-space: nowrap; }
         #ghost-quote {
-            font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; 
-            display: none; opacity: 0; font-style: italic; line-height: 1.9;
-            pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease;
+            font-size: 12px; color: #ffffff; font-weight: 400; letter-spacing: 1.5px; display: none; opacity: 0; font-style: italic; line-height: 2.0;
+            pointer-events: auto; cursor: pointer;
         }
-        #ghost-quote:active { opacity: 0.5; }
-
-        @keyframes windDissolve {
-            0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; }
-            100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; }
-        }
-        .dissolve-anim {
-            animation: windDissolve 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-        
-        @keyframes fadeInQuote {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in-anim {
-            animation: fadeInQuote 2.5s ease forwards;
-        }
-
+        @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0); } 100% { opacity: 0; filter: blur(12px); transform: translate3d(20px, -10px, 0); } }
+        .dissolve-anim { animation: windDissolve 2.5s forwards; }
+        @keyframes fadeInQuote { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in-anim { animation: fadeInQuote 2.5s ease forwards; }
     </style>
 </head>
 <body>
     <div id="fade-in-overlay"></div>
     <div id="bg-image"></div>
     <div id="glass-overlay"></div>
-
     <div id="ui-layer">
         <div id="intro-box">
             <h1>躯壳之外<span class="en-title">BEYOND THE SHELL</span></h1>
-            <p>这里是过滤数字噪点的私人温室。<br>请在此键入你的诞生之日（如 0203），<br>这串你在物理世界的初始时间戳，将作为唤醒的唯一密钥。</p>
+            <p>这里是过滤数字噪点的私人温室。<br>请在此键入你的诞生之日（如 0203）。</p>
         </div>
         <button id="dive-btn" class="btn-style" onclick="showInput()">构建密钥</button>
-        
         <div id="birthday-ui">
-            <input type="text" id="bday-input" maxlength="4" placeholder="MMDD" autocomplete="off" pattern="\d*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
-            <button id="awaken-btn" class="btn-style" onclick="awakenGhost()">唤醒 Ghost</button>
+            <input type="text" id="bday-input" maxlength="4" placeholder="MMDD" autocomplete="off">
+            <button class="btn-style" onclick="awakenGhost()">唤醒 Ghost</button>
         </div>
     </div>
-
     <div id="ghost-info">
         <div id="oracle-group">
             <div class="ghost-header" id="ghost-coord"></div>
             <div id="ghost-oracle"></div>
         </div>
         <div id="ghost-quote" onclick="restoreOracle()">
-            <div style="display:block; white-space:nowrap; padding-bottom:2px;">“我们如今仿佛对镜观看，模糊不清，到那时就要面对面了，</div>
+            <div style="display:block; white-space:nowrap;">“我们如今仿佛对镜观看，模糊不清，到那时就要面对面了，</div>
             <div style="display:block; white-space:nowrap;">我如今所知道的有限，到那时就全知道，如同造物主知道我一样。”</div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
-    
     <script>
         window.onload = () => { document.getElementById('fade-in-overlay').style.opacity = '0'; }
-
         let scene, camera, renderer, linesGrass, metalFlower, bokehParticles;
         const mouse = new THREE.Vector2();
-        const targetFollow = new THREE.Vector3();
-        let gardenActive = false; 
-        
-        let ghostMaterial, ghostLight; 
-        let isAwakening = false;
-        
-        let currentScale = { x: 2.5, y: 2.5, z: 2.5 };
-        let targetScale = { x: 2.5, y: 2.5, z: 2.5 };
-        let heartBase = 1.0, heartSub = 0.5;
+        let gardenActive = false, isAwakening = false;
+        let ghostMaterial, ghostLight, animTimer1, animTimer2;
+        let currentScale = { x: 2.5, y: 2.5, z: 2.5 }, targetScale = { x: 2.5, y: 2.5, z: 2.5 };
 
-        let animTimer1, animTimer2;
-
-        // ⚠️ 修复 2：极度简练、流动神谕重写。深入星座八字低饱和度克制调性。
         function generateOracle(month, day) {
-            let spiritualBase = "";
-            if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) spiritualBase = "散发纯粹初生动能，撕裂平庸";
-            else if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) spiritualBase = "沉淀绝对物理秩序，构筑坚定重力场";
-            else if ((month === 5 && day >= 21) || (month === 6 && day <= 21)) spiritualBase = "游离多维度折射，维持叠加态";
-            else if ((month === 6 && day >= 22) || (month === 7 && day <= 22)) spiritualBase = "包裹极度柔软内核，孵化感知";
-            else if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) spiritualBase = "散发绝对辐射，确立自我坐标";
-            else if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) spiritualBase = "坍缩精密纯粹逻辑，剥离冗余";
-            else if ((month === 9 && day >= 23) || (month === 10 && day <= 23)) spiritualBase = "维系优雅力学张力，坚韧重塑";
-            else if ((month === 10 && day >= 24) || (month === 11 && day <= 22)) spiritualBase = "潜伏于不可见深渊，酿造锐度";
-            else if ((month === 11 && day >= 23) || (month === 12 && day <= 21)) spiritualBase = "拒绝已知坐标锁定，延展孤独矢量";
-            else if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) spiritualBase = "漫长时间中缓慢结晶，筑抵御虚无骨骼";
-            else if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) spiritualBase = "数字季风中的逆行者，游离在常规介质之外";
-            else if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) spiritualBase = "将边界消融于无形，对数据波纹产生漣漪";
-            else spiritualBase = "在数字洪流中静默生长，以不可名状完成参数自洽";
-
-            const actions = ["静默注视着", "从容游离于", "温柔解析着", "孤独贯穿了", "坚韧重塑着", "敏锐捕捉着", "冷眼旁观着", "深刻刻画着", "轻盈越过了", "无声沉潜入"];
-            const objects = ["既定宿命", "喧嚣洪流", "时间的枷锁", "微观震荡", "同质法则", "不被察觉微观情绪", "真实自我边界", "逻辑背后幽暗深海", "理性的冰冷壁垒", "原始生命体波纹"];
-            
-            const hashA = (month * 17 + day * 23) % 10;
-            const hashB = (month * 31 + day * 13) % 10;
-            
-            // ⚠️ 修复 2：彻底删掉生硬的“独特性”，简化为一句流畅神谕。
-            return `你的 Ghost ${spiritualBase}。<br>正${actions[hashA]}${objects[hashB]}。`;
+            const bases = [
+                "如寒冬尽头的破土之芽，带着季风的清冽", "像深海沉寂的琥珀，封存了远古的星晖", "如游走在云端的孤独波段，不染尘埃", 
+                "似月色下的潮汐起伏，温柔中带有坚韧", "如山巅终年不化的积雪，冷峻而纯粹", "像荒原上唯一的植株，沉默地确立坐标"
+            ];
+            const spirits = [
+                "静默地注视着时间的纹理", "轻盈地穿过喧嚣的数字洪流", "在宿命的枷锁中寻找回声", "温柔地解析着万物的震荡", 
+                "独自重塑着被同化的法则", "捕捉着空气中微弱的共鸣", "冷眼观望着逻辑背后的深海"
+            ];
+            const hashA = (month * 13 + day * 7) % bases.length;
+            const hashB = (month * 17 + day * 3) % spirits.length;
+            return `你的 Ghost ${bases[hashA]}。<br>${spirits[hashB]}。`;
         }
 
         function init3D() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 1.5, 8); 
-
+            camera.position.set(0, 1.5, 8);
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
 
-            const envCanvas = document.createElement('canvas');
-            envCanvas.width = 64; envCanvas.height = 64;
-            const envCtx = envCanvas.getContext('2d');
-            const envGrad = envCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
-            envGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
-            envGrad.addColorStop(1, 'rgba(10, 15, 20, 1)');
-            envCtx.fillStyle = envGrad; envCtx.fillRect(0, 0, 64, 64);
-            const envMap = new THREE.CanvasTexture(envCanvas);
-            envMap.mapping = THREE.EquirectangularReflectionMapping;
-            scene.environment = envMap;
-
-            const grassWidth = 80, grassDepth = 50, lineCount = 5500;
-            const linesGeometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(lineCount * 18); 
-            for (let i = 0; i < lineCount; i++) {
-                const x = Math.random() * grassWidth - grassWidth/2;
-                const z = Math.random() * grassDepth - grassDepth/2;
-                const h = 1.0 + Math.random() * 1.5;
-                const p0y = -1, p1y = -1 + h*0.33, p2y = -1 + h*0.66, p3y = -1 + h;
-                positions[i*18+0] = x; positions[i*18+1] = p0y; positions[i*18+2] = z;
-                positions[i*18+3] = x; positions[i*18+4] = p1y; positions[i*18+5] = z;
-                positions[i*18+6] = x; positions[i*18+7] = p1y; positions[i*18+8] = z;
-                positions[i*18+9] = x; positions[i*18+10]= p2y; positions[i*18+11]= z;
-                positions[i*18+12]= x; positions[i*18+13]= p2y; positions[i*18+14]= z;
-                positions[i*18+15]= x; positions[i*18+16]= p3y; positions[i*18+17]= z;
-            }
-            linesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            const linesMaterial = new THREE.LineBasicMaterial({ color: 0xcceeff, transparent: true, opacity: 0.35 });
-            linesGrass = new THREE.LineSegments(linesGeometry, linesMaterial);
-            scene.add(linesGrass);
-
-            // ⚠️ 修复 1：粒子纹理生成重构。不再使用实心圆，重做为柔和散焦的高斯白光。
             const canvas = document.createElement('canvas');
-            canvas.width = 64; canvas.height = 64; // 提升纹理精度，根除彩色噪点
-            const context = canvas.getContext('2d');
-            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
-            // 中心纯白，向外高斯模糊渐变，模拟真实光斑的散焦效果
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
-            gradient.addColorStop(0.3, 'rgba(230, 240, 255, 0.6)'); // 带一点清冷赛博感
-            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            context.fillStyle = gradient; context.fillRect(0, 0, 64, 64);
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, 64, 64);
             const particleTexture = new THREE.CanvasTexture(canvas);
 
             const bokehGeometry = new THREE.BufferGeometry();
-            const bokehPositions = new Float32Array(140 * 3);
+            const bokehPos = new Float32Array(140 * 3);
             for(let i = 0; i < 140; i++) { 
-                bokehPositions[i*3] = (Math.random() - 0.5) * 35; 
-                bokehPositions[i*3+1] = (Math.random() - 0.5) * 35; 
-                // ⚠️ 修复 1：Z轴结界，锁定在 -15 到 3 之间，永远不贴镜头脸上，最大不会遮蔽花朵
-                bokehPositions[i*3+2] = Math.random() * 18 - 15; 
+                bokehPos[i*3] = (Math.random() - 0.5) * 35; 
+                bokehPos[i*3+1] = (Math.random() - 0.5) * 35; 
+                bokehPos[i*3+2] = Math.random() * 18 - 15; 
             }
-            bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPositions, 3));
-            
-            // ⚠️ 修复 1：启用尺寸衰减 (sizeAttenuation: true)，物理近大远小，根除死白呆板圆晕。
-            const bokehMaterial = new THREE.PointsMaterial({ 
-                color: 0xffffff, size: 0.35, // 开启衰减后，调整基础尺寸
-                sizeAttenuation: true, // 核心修复：物理近大远小
-                transparent: true, opacity: 0.85, 
-                map: particleTexture, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending 
-            });
-            bokehParticles = new THREE.Points(bokehGeometry, bokehMaterial);
+            bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPos, 3));
+            const bokehMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.35, transparent: true, opacity: 0.8, map: particleTexture, depthTest: false, blending: THREE.AdditiveBlending });
+            bokehParticles = new THREE.Points(bokehGeometry, bokehMat);
             scene.add(bokehParticles);
 
             ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
-
             const objLoader = new THREE.OBJLoader();
-            objLoader.load('flower.obj', function (object) {
-                object.traverse(function (child) { if (child.isMesh) child.material = ghostMaterial; });
+            objLoader.load('flower.obj', (object) => {
+                object.traverse((child) => { if (child.isMesh) child.material = ghostMaterial; });
                 const box = new THREE.Box3().setFromObject(object);
                 const center = box.getCenter(new THREE.Vector3());
-                object.position.sub(center); 
-                
+                object.position.sub(center);
                 const wrapper = new THREE.Group();
                 wrapper.add(object);
-                wrapper.scale.set(currentScale.x, currentScale.y, currentScale.z); 
-                wrapper.position.y = 1.5; 
+                wrapper.position.y = 1.5;
                 metalFlower = wrapper;
-                
-                metalFlower.visible = false; 
+                metalFlower.visible = false;
                 scene.add(metalFlower);
             });
 
             ghostLight = new THREE.PointLight(0xffffff, 0, 12);
             scene.add(ghostLight);
-
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            const skyLight = new THREE.DirectionalLight(0xaaccff, 1.2); skyLight.position.set(5, 10, -5); scene.add(skyLight);
-            const frontLight = new THREE.DirectionalLight(0xffffff, 1.5); frontLight.position.set(0, 2, 10); scene.add(frontLight);
-
-            window.addEventListener('mousemove', (event) => {
-                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            });
-            window.addEventListener('touchmove', (event) => {
-                if(event.touches.length > 0) {
-                    mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
-                    mouse.y = -(event.touches[0].clientY / window.innerHeight) * 2 + 1;
-                }
-            }, { passive: true });
-
-            window.addEventListener('resize', onWindowResize);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.4));
             animate();
-        }
-
-        function updateLinesGrass(time) {
-            const positions = linesGrass.geometry.attributes.position.array;
-            for (let i = 0; i < 5500; i++) {
-                const baseX = positions[i*18 + 0]; 
-                const z = positions[i*18 + 2];
-                const wind = Math.sin(time * 1.5 + z * 0.2);
-                const mouseAvoid = gardenActive ? mouse.x * 1.5 : 0; 
-                const totalOffset = wind + mouseAvoid;
-                positions[i*18 + 3] = baseX + totalOffset * 0.08; positions[i*18 + 6] = baseX + totalOffset * 0.08;
-                positions[i*18 + 9] = baseX + totalOffset * 0.3;  positions[i*18 + 12] = baseX + totalOffset * 0.3;
-                positions[i*18 + 15] = baseX + totalOffset * 0.8;
-            }
-            linesGrass.geometry.attributes.position.needsUpdate = true;
         }
 
         function animate() {
             requestAnimationFrame(animate);
             const time = performance.now() * 0.001;
-
-            if(linesGrass) updateLinesGrass(time);
-            
-            if(bokehParticles) {
-                bokehParticles.rotation.y = time * 0.03 + (isAwakening ? 0.08 : 0); 
-                bokehParticles.position.y = Math.sin(time * 0.5) * 0.5;
-            }
-            
-            if(metalFlower && metalFlower.visible) { 
+            if(bokehParticles) bokehParticles.rotation.y = time * 0.03;
+            if(metalFlower && metalFlower.visible) {
                 if(isAwakening) {
-                    currentScale.x += (targetScale.x - currentScale.x) * 0.06;
-                    currentScale.y += (targetScale.y - currentScale.y) * 0.06;
-                    currentScale.z += (targetScale.z - currentScale.z) * 0.06;
+                    currentScale.x += (targetScale.x - currentScale.x) * 0.05;
+                    currentScale.y += (targetScale.y - currentScale.y) * 0.05;
+                    currentScale.z += (targetScale.z - currentScale.z) * 0.05;
                     metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z);
-                    
-                    metalFlower.rotation.y += 0.25; 
-                    metalFlower.rotation.z += 0.05;
-                    
-                    if (Math.abs(targetScale.y - currentScale.y) < 0.05) isAwakening = false;
-                } else if(gardenActive) {
-                    targetFollow.set(mouse.x * 4, mouse.y * 3 + 1.5, 5);
-                    metalFlower.lookAt(targetFollow);
-                    metalFlower.rotation.z += 0.002; 
+                    metalFlower.rotation.y += 0.1;
+                    if(Math.abs(targetScale.x - currentScale.x) < 0.01) isAwakening = false;
                 } else {
-                    metalFlower.rotation.y += 0.003;
+                    metalFlower.rotation.y += 0.005;
+                    metalFlower.position.y = 1.5 + Math.sin(time) * 0.1;
                 }
-                
-                const breathOffset = Math.sin(time * heartBase) * 0.15 + Math.sin(time * heartSub) * 0.05;
-                metalFlower.position.y = 1.5 + breathOffset;
-                
-                if(gardenActive) ghostLight.intensity = 1.5 + Math.sin(time * heartBase * 2) * 0.5;
                 ghostLight.position.copy(metalFlower.position);
             }
-
             renderer.render(scene, camera);
         }
 
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function showInput() {
-            document.getElementById('intro-box').style.display = 'none';
+        function showInput() { 
+            document.getElementById('intro-box').style.display = 'none'; 
             document.getElementById('dive-btn').style.display = 'none';
-            
-            const bdayUI = document.getElementById('birthday-ui');
-            bdayUI.style.display = 'flex';
-            setTimeout(() => { bdayUI.style.opacity = '1'; }, 50);
-            document.getElementById('bday-input').focus();
+            document.getElementById('birthday-ui').style.display = 'flex';
+            setTimeout(() => document.getElementById('birthday-ui').style.opacity = '1', 50);
         }
 
         function startOracleTimer() {
-            clearTimeout(animTimer1);
-            clearTimeout(animTimer2);
-            
-            const oracleGroup = document.getElementById('oracle-group');
-            const quoteEl = document.getElementById('ghost-quote');
-            
+            clearTimeout(animTimer1); clearTimeout(animTimer2);
             animTimer1 = setTimeout(() => {
-                oracleGroup.classList.add('dissolve-anim');
-                
+                document.getElementById('oracle-group').classList.add('dissolve-anim');
                 animTimer2 = setTimeout(() => {
-                    oracleGroup.style.display = 'none';
-                    quoteEl.style.display = 'block';
-                    quoteEl.classList.add('fade-in-anim');
+                    document.getElementById('oracle-group').style.display = 'none';
+                    document.getElementById('ghost-quote').style.display = 'block';
+                    document.getElementById('ghost-quote').classList.add('fade-in-anim');
                 }, 2500);
-                
-            }, 15000); 
+            }, 15000);
         }
 
         function restoreOracle() {
-            const oracleGroup = document.getElementById('oracle-group');
-            const quoteEl = document.getElementById('ghost-quote');
-            
-            quoteEl.style.display = 'none';
-            quoteEl.classList.remove('fade-in-anim');
-            
-            oracleGroup.style.display = 'block';
-            oracleGroup.classList.remove('dissolve-anim');
-            void oracleGroup.offsetWidth; 
-            
+            document.getElementById('ghost-quote').style.display = 'none';
+            document.getElementById('oracle-group').style.display = 'block';
+            document.getElementById('oracle-group').classList.remove('dissolve-anim');
             startOracleTimer();
         }
 
         function awakenGhost() {
-            const inputVal = document.getElementById('bday-input').value;
-            if(inputVal.length !== 4) { alert("请输入完整的四位数字（如 0203）"); return; }
+            const val = document.getElementById('bday-input').value;
+            if(val.length !== 4) return;
+            const m = parseInt(val.substring(0, 2)), d = parseInt(val.substring(2, 4));
             
-            const month = parseInt(inputVal.substring(0, 2));
-            const day = parseInt(inputVal.substring(2, 4));
-            if(month < 1 || month > 12 || day < 1 || day > 31) { alert("坐标格式有误，请输入合法日期"); return; }
-
-            let colorDesc = "";
-            let phaseName = "";
-            
+            // ⚠️ 物理参数重构：解决死白，引入深度色彩
             ghostMaterial.color.set('#fff');
             ghostMaterial.emissive.set('#000');
-            ghostMaterial.metalness = 0.0;
+            ghostMaterial.transmission = 0;
+            ghostMaterial.thickness = 0;
             ghostMaterial.roughness = 0.5;
-            ghostMaterial.transmission = 0.0;
-            ghostMaterial.ior = 1.5;
-            ghostMaterial.thickness = 0.0;
-            ghostMaterial.clearcoat = 0.0;
-            ghostMaterial.opacity = 1.0;
-            ghostMaterial.emissiveIntensity = 0.0;
+            ghostMaterial.opacity = 1;
 
-            // ⚠️ 修复 1：信仰回溯！完全还原我说完美的最初 0203 丹宁蓝与暗物质瓷公式。
-            if (inputVal === "0203") {
-                const uniqueColor = new THREE.Color().setHSL(0.6615, 0.6387, 0.7); // 完美的丹宁蓝比例
-                
-                ghostMaterial.color.copy(uniqueColor);
-                ghostMaterial.emissive.copy(uniqueColor);
-                ghostMaterial.metalness = 0.0;
+            if(val === "0203") {
+                const c = new THREE.Color().setHSL(0.66, 0.64, 0.7);
+                ghostMaterial.color.set('#111');
+                ghostMaterial.emissive.copy(c);
                 ghostMaterial.roughness = 0.9;
-                ghostMaterial.clearcoat = 0.0;
-                ghostMaterial.emissiveIntensity = 0.3;
-                
-                ghostLight.color.copy(uniqueColor);
-                ghostLight.intensity = 2.0;
-                
-                colorDesc = "深邃的丹宁蓝频段";
-                phaseName = "暗物质瓷";
-                
+                ghostLight.color.copy(c); ghostLight.intensity = 2;
+                document.getElementById('ghost-coord').innerHTML = `[ 坐标：0203 | 相态：暗物质瓷 | 色谱：深邃丹宁 ]`;
             } else {
-                let rawHue = ((month - 1) * 31 + day) % 360; 
-                if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360; 
-                
-                const hue = rawHue / 360; 
-                const saturation = 0.2 + (day / 31) * 0.25; 
-                const lightness = 0.35 + (month % 3) * 0.15; 
-                
-                const uniqueColor = new THREE.Color().setHSL(hue, saturation, lightness);
-
-                if (rawHue < 50) colorDesc = "生锈的琥珀金频段";
-                else if (rawHue < 80) colorDesc = "黯淡的微光绿频段";
-                else if (rawHue < 170) colorDesc = "深海的冰蓝频段";
-                else if (rawHue < 250) colorDesc = "哑光的丹宁频段";
-                else if (rawHue < 300) colorDesc = "褪色的赛博紫频段";
-                else colorDesc = "低保真的千禧粉频段";
-
-                const phaseVal = (month * 7 + day * 11) % 6;
-                
-                if (phaseVal === 0) { 
-                    ghostMaterial.color.set('#aaaaaa');
-                    ghostMaterial.emissive.set('#555555');
-                    ghostMaterial.metalness = 1.0;
+                const hue = ((m * 31 + d) % 360) / 360;
+                const c = new THREE.Color().setHSL(hue, 0.4, 0.5);
+                const phase = (m + d) % 3;
+                if(phase === 0) { // 琉璃：不再死白
+                    ghostMaterial.color.copy(c).multiplyScalar(0.2); // 压低底色
+                    ghostMaterial.transmission = 1;
+                    ghostMaterial.thickness = 2;
+                    ghostMaterial.ior = 1.5;
                     ghostMaterial.roughness = 0.05;
-                    phaseName = "赛博液态银";
-                    ghostLight.color.set('#ffffff');
-                    ghostLight.intensity = 2.0;
-                } else if (phaseVal === 1) { 
-                    ghostMaterial.color.copy(uniqueColor);
-                    ghostMaterial.transmission = 1.0;
-                    ghostMaterial.ior = 1.33; 
-                    ghostMaterial.roughness = 0.1;
-                    ghostMaterial.thickness = 1.5;
-                    ghostMaterial.opacity = 1.0; 
-                    ghostMaterial.clearcoat = 0.8;
-                    phaseName = "灵动水态";
-                    ghostLight.color.copy(uniqueColor);
-                    ghostLight.intensity = 0.5;
-                } else if (phaseVal === 2) { 
-                    ghostMaterial.color.copy(uniqueColor);
-                    ghostMaterial.transmission = 1.0;
-                    ghostMaterial.ior = 1.55; 
-                    ghostMaterial.roughness = 0.02;
-                    ghostMaterial.thickness = 2.0;
-                    ghostMaterial.opacity = 1.0;
-                    ghostMaterial.clearcoat = 1.0;
-                    phaseName = "高折射琉璃";
-                    ghostLight.color.copy(uniqueColor);
-                    ghostLight.intensity = 0.5;
-                } else if (phaseVal === 3) { 
-                    ghostMaterial.color.copy(uniqueColor);
-                    ghostMaterial.metalness = 0.8;
-                    ghostMaterial.roughness = 0.5;
-                    ghostMaterial.emissive.copy(uniqueColor);
-                    ghostMaterial.emissiveIntensity = 0.2;
-                    phaseName = "哑光钛素";
-                    ghostLight.color.copy(uniqueColor);
-                    ghostLight.intensity = 2.0;
-                } else if (phaseVal === 4) { 
-                    ghostMaterial.color.copy(uniqueColor);
-                    ghostMaterial.metalness = 0.2;
-                    ghostMaterial.roughness = 0.6;
-                    ghostMaterial.transmission = 0.5;
-                    ghostMaterial.thickness = 1.0;
-                    ghostMaterial.opacity = 1.0;
-                    ghostMaterial.emissive.copy(uniqueColor);
-                    ghostMaterial.emissiveIntensity = 0.4;
-                    phaseName = "色散雾化晶体";
-                    ghostLight.color.copy(uniqueColor);
-                    ghostLight.intensity = 1.0;
-                } else { 
-                    ghostMaterial.color.set('#1a1a1a');
-                    ghostMaterial.emissive.copy(uniqueColor);
-                    ghostMaterial.metalness = 0.0;
-                    ghostMaterial.roughness = 0.9;
-                    ghostMaterial.emissiveIntensity = 0.35;
-                    phaseName = "暗物质瓷";
-                    ghostLight.color.copy(uniqueColor);
-                    ghostLight.intensity = 2.0;
+                    ghostMaterial.attenuationColor = c; // 引入吸收色
+                    ghostMaterial.attenuationDistance = 0.5;
+                    ghostLight.intensity = 0.3;
+                    document.getElementById('ghost-coord').innerHTML = `[ 坐标：${val} | 相态：高折射琉璃 ]`;
+                } else if(phase === 1) { // 镜面
+                    ghostMaterial.metalness = 1; ghostMaterial.roughness = 0.1;
+                    ghostMaterial.color.copy(c);
+                    ghostLight.intensity = 1.5;
+                    document.getElementById('ghost-coord').innerHTML = `[ 坐标：${val} | 相态：液态金属 ]`;
+                } else {
+                    ghostMaterial.color.set('#1a1a1a'); ghostMaterial.emissive.copy(c);
+                    ghostMaterial.roughness = 0.9; ghostLight.intensity = 2;
+                    document.getElementById('ghost-coord').innerHTML = `[ 坐标：${val} | 相态：暗物质瓷 ]`;
                 }
+                ghostLight.color.copy(c);
             }
 
-            ghostMaterial.needsUpdate = true;
-
-            targetScale.x = 1.3 + (month / 12) * 3.0; 
-            targetScale.z = targetScale.x;
-            targetScale.y = 1.3 + (day / 31) * 3.5;   
-
-            heartBase = 0.8 + (day / 31) * 2.0;
-            heartSub = 1.0 + (month / 12) * 3.0;
-
-            currentScale = { x: 0.1, y: 0.1, z: 0.1 }; 
-            metalFlower.scale.set(0.1, 0.1, 0.1);
-            
-            metalFlower.visible = true;
-            isAwakening = true;
-
-            document.getElementById('glass-overlay').style.opacity = '0';
+            targetScale.x = 1.5 + (m/12)*2; targetScale.y = 1.5 + (d/31)*2;
+            metalFlower.visible = true; isAwakening = true;
             document.getElementById('ui-layer').style.opacity = '0';
-            setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500);
-            
-            const oracleText = generateOracle(month, day);
-            document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：${phaseName} | 色谱：${colorDesc} ]`;
-            document.getElementById('ghost-oracle').innerHTML = oracleText;
+            document.getElementById('ghost-oracle').innerHTML = generateOracle(m, d);
             document.getElementById('ghost-info').style.opacity = '1';
-
-            gardenActive = true; 
-
             startOracleTimer();
         }
-
-        document.getElementById('bday-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') awakenGhost();
-        });
 
         init3D();
     </script>
