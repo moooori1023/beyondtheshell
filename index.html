@@ -24,13 +24,14 @@
             z-index: 1; pointer-events: none; 
         }
 
-        #glass-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(10, 15, 20, 0.45); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px);
-            z-index: 5; transition: opacity 2.5s ease; pointer-events: none;
-        }
+#glass-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    /* ⚠️ 这里的数值决定了“玻璃感”：0.15是透明度，4px是模糊度 */
+    background: rgba(10, 15, 20, 0.15); 
+    backdrop-filter: blur(4px); 
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 5; transition: opacity 2.5s ease; pointer-events: none;
+}
 
         #ui-layer {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
