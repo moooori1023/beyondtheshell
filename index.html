@@ -12,7 +12,6 @@
             touch-action: none;
         }
         
-        /* ⚠️ 修复：不再使用被墙的 ImgBB 链接，改为直接读取 GitHub 里的 bg.jpg */
         #bg-image {
             position: fixed; top: -5%; left: -5%; width: 110vw; height: 110vh;
             background-image: url('bg.jpg'); 
@@ -83,10 +82,10 @@
         #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
 
         #ghost-info {
-            position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%);
-            color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8;
+            position: fixed; bottom: clamp(25px, 6vh, 45px); left: 50%; transform: translateX(-50%);
+            color: rgba(255,255,255,0.9); text-align: center; font-weight: 300;
             opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none;
-            width: 90%; max-width: 750px;
+            width: 85%; max-width: 750px;
         }
         
         #oracle-group {
@@ -94,17 +93,18 @@
         }
 
         .ghost-header {
-            font-size: clamp(9px, 2vw, 11px); color: #ccc; margin-bottom: clamp(8px, 2vh, 12px); 
-            font-family: monospace; letter-spacing: 3px; font-weight: 300;
+            font-size: clamp(9px, 2vw, 11px); color: #ccc; margin-bottom: clamp(10px, 2.5vh, 15px); 
+            font-family: monospace; letter-spacing: 2px; font-weight: 300; line-height: 1.6;
         }
         
+        /* ⚠️ 修复 1：彻底删除截断代码，允许文字在手机端自然换行显示完全 */
         #ghost-oracle {
-            font-size: clamp(11px, 2.5vw, 13px); color: #ddd; font-weight: 300; letter-spacing: 1.5px; 
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+            font-size: clamp(12px, 3vw, 14px); color: #ddd; font-weight: 300; letter-spacing: 1.5px; 
+            line-height: 2.0; 
         }
 
         #ghost-quote {
-            font-size: clamp(11px, 2.5vw, 13px); color: #bbb; font-weight: 300; letter-spacing: 1.5px; 
+            font-size: clamp(11px, 2.8vw, 13px); color: #bbb; font-weight: 300; letter-spacing: 1.5px; 
             display: none; opacity: 0; font-style: italic; line-height: 2.0;
         }
 
@@ -170,6 +170,7 @@
         let targetScale = { x: 2.5, y: 2.5, z: 2.5 };
         let heartBase = 1.0, heartSub = 0.5;
 
+        // ⚠️ 修复：移除强制的 <br> 换行符，让长句子在移动端自然流畅地换行铺展
         function generateOracle(month, day) {
             let spiritualBase = "";
             if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) spiritualBase = "散发着不可驯服的初生动能，以一种原始而纯粹的锐度撕裂平庸";
@@ -192,7 +193,7 @@
             const hashA = (month * 17 + day * 23) % 10;
             const hashB = (month * 31 + day * 13) % 10;
             
-            return `你的 Ghost ${spiritualBase}。<br>正${actions[hashA]}${objects[hashB]}，呈现出躯壳之外绝对的精神独特性。`;
+            return `你的 Ghost ${spiritualBase}。正${actions[hashA]}${objects[hashB]}，呈现出躯壳之外绝对的精神独特性。`;
         }
 
         function init3D() {
@@ -225,13 +226,15 @@
             linesGrass = new THREE.LineSegments(linesGeometry, linesMaterial);
             scene.add(linesGrass);
 
+            // ⚠️ 修复 2：画板精度翻倍至 64x64，并彻底去除中心半透明渐变，根除移动端渲染出的彩色噪点
             const canvas = document.createElement('canvas');
-            canvas.width = 32; canvas.height = 32;
+            canvas.width = 64; canvas.height = 64;
             const context = canvas.getContext('2d');
-            const gradient = context.createRadialGradient(16, 16, 0, 16, 16, 16);
-            gradient.addColorStop(0, 'rgba(255,255,255,0.85)');
-            gradient.addColorStop(1, 'rgba(255,255,255,0)');
-            context.fillStyle = gradient; context.fillRect(0, 0, 32, 32);
+            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
+            gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.6)');
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            context.fillStyle = gradient; context.fillRect(0, 0, 64, 64);
             const particleTexture = new THREE.CanvasTexture(canvas);
 
             const bokehGeometry = new THREE.BufferGeometry();
@@ -239,7 +242,7 @@
             for(let i = 0; i < 140 * 3; i++) { bokehPositions[i] = (Math.random() - 0.5) * 35; }
             bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPositions, 3));
             const bokehMaterial = new THREE.PointsMaterial({ 
-                color: 0xffeebb, size: 0.35, transparent: true, opacity: 0.85, 
+                color: 0xffeebb, size: 0.38, transparent: true, opacity: 0.8, 
                 map: particleTexture, depthWrite: false, blending: THREE.AdditiveBlending 
             });
             bokehParticles = new THREE.Points(bokehGeometry, bokehMaterial);
