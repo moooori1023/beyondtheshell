@@ -35,23 +35,39 @@
         .en-title { display: block; font-size: clamp(9px, 2vw, 11px); font-family: monospace; letter-spacing: 8px; color: rgba(255,255,255,0.5); margin-top: 8px; font-weight: 300; }
         #intro-box p { font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; letter-spacing: 2px; color: rgba(255,255,255,0.85); }
         .btn-style { background: rgba(255, 255, 255, 0.9); color: #000; border: none; padding: clamp(10px, 2vh, 12px) clamp(30px, 6vw, 40px); border-radius: 30px; cursor: pointer; font-size: clamp(11px, 2.5vw, 13px); letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease; pointer-events: auto; }
-        .btn-style:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.3); }
         #birthday-ui { display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; pointer-events: auto; text-align: center; }
         #bday-input { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.6); color: #fff; font-size: clamp(26px, 6vw, 35px); text-align: center; width: clamp(140px, 40vw, 180px); letter-spacing: 12px; outline: none; font-family: 'Courier New', Courier, monospace; font-weight: 300; margin-bottom: 35px; padding-bottom: 5px; transition: border-color 0.3s ease; }
         #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
-        #ghost-info { position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8; opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none; width: 95vw; max-width: 750px; }
-        #oracle-group { will-change: transform, opacity, filter, letter-spacing; }
-        .ghost-header { font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); font-family: monospace; letter-spacing: 2px; font-weight: 400; white-space: nowrap; }
-        #ghost-oracle { font-size: clamp(9px, 2.6vw, 12.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; line-height: 2.2; white-space: nowrap; }
         
-        /* ⚠️ 底部小字：字号与坐标对齐，禁止换行 */
-        .ghost-footer { font-size: clamp(9px, 2.2vw, 12px); color: rgba(255,255,255,0.4); margin-top: 15px; letter-spacing: 1px; font-weight: 300; white-space: nowrap; }
+        /* 判词容器修复：确保折行 */
+        #ghost-info { 
+            position: fixed; bottom: clamp(30px, 8vh, 60px); left: 50%; transform: translateX(-50%); 
+            color: rgba(255,255,255,0.9); text-align: center; opacity: 0; transition: opacity 2.5s ease; 
+            z-index: 100; pointer-events: none; width: 85vw; max-width: 600px; 
+        }
+        .ghost-header { font-size: clamp(9px, 2.2vw, 11px); color: rgba(255,255,255,0.7); margin-bottom: 15px; font-family: monospace; letter-spacing: 2px; }
+        
+        /* ⚠️ 核心修复 1：判词折行控制 */
+        #ghost-oracle { 
+            font-size: clamp(10px, 2.8vw, 13px); color: #eeeeee; font-weight: 300; 
+            letter-spacing: 1.5px; line-height: 1.8; 
+            white-space: normal; /* 允许换行 */
+            word-break: break-all; /* 强制在窄屏处折断 */
+            display: block; width: 100%;
+        }
+        
+        /* ⚠️ 核心修复 2：灰色小字加粗加亮 */
+        .ghost-footer { 
+            font-size: clamp(9px, 2.2vw, 11px); 
+            color: rgba(255,255,255,0.6); /* 稍微调亮 */
+            margin-top: 20px; letter-spacing: 1px; 
+            font-weight: 500; /* 加粗到500 */
+            line-height: 1.6;
+        }
 
-        #ghost-quote { font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; display: none; opacity: 0; font-style: italic; line-height: 1.9; pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease; }
-        @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; } 100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; } }
-        .dissolve-anim { animation: windDissolve 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
-        @keyframes fadeInQuote { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in-anim { animation: fadeInQuote 2.5s ease forwards; }
+        #ghost-quote { font-size: clamp(10px, 2.8vw, 13px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; display: none; opacity: 0; font-style: italic; line-height: 2.2; pointer-events: auto; cursor: pointer; }
+        @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0,0,0); } 100% { opacity: 0; filter: blur(15px); transform: translate3d(20px,-10px,0); } }
+        .dissolve-anim { animation: windDissolve 3s ease forwards; }
     </style>
 </head>
 <body>
@@ -61,12 +77,12 @@
     <div id="ui-layer">
         <div id="intro-box">
             <h1>躯壳之外<span class="en-title">BEYOND THE SHELL</span></h1>
-            <p>这里是过滤数字噪点的私人温室。<br>请在此键入你的诞生之日（如 0203），<br>这串你在物理世界的初始时间戳，将作为唤醒的唯一密钥。</p>
+            <p>这里是过滤数字噪点的私人温室。<br>请在此键入你的诞生之日（如 0203）</p>
         </div>
         <button id="dive-btn" class="btn-style" onclick="showInput()">构建密钥</button>
         <div id="birthday-ui">
-            <input type="text" id="bday-input" maxlength="4" placeholder="MMDD" autocomplete="off" pattern="\d*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
-            <button id="awaken-btn" class="btn-style">唤醒 Ghost</button>
+            <input type="text" id="bday-input" maxlength="4" placeholder="MMDD" inputmode="numeric">
+            <button id="awaken-btn" class="btn-style" onclick="awakenGhost()">唤醒 Ghost</button>
         </div>
     </div>
     <div id="ghost-info">
@@ -76,8 +92,7 @@
             <div class="ghost-footer" id="ghost-unique"></div>
         </div>
         <div id="ghost-quote" onclick="restoreOracle()">
-            <div style="display:block; white-space:nowrap; padding-bottom:2px;">“我们如今仿佛对镜观看，模糊不清，到那时就要面对面了，</div>
-            <div style="display:block; white-space:nowrap;">我如今所知道的有限，到那时就全知道，如同造物主知道我一样。”</div>
+            “我们如今仿佛对镜观看，模糊不清，到那时就要面对面了。”
         </div>
     </div>
 
@@ -85,149 +100,130 @@
     <script src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script>
         window.onload = () => { document.getElementById('fade-in-overlay').style.opacity = '0'; }
-        let scene, camera, renderer, linesGrass, metalFlower, bokehParticles;
-        const mouse = new THREE.Vector2(), targetFollow = new THREE.Vector3();
+        let scene, camera, renderer, linesGrass, metalFlower, bokehParticles, ghostMaterial, ghostLight;
+        const mouse = new THREE.Vector2();
         let gardenActive = false, isAwakening = false;
         let currentScale = { x: 2.5, y: 2.5, z: 2.5 }, targetScale = { x: 2.5, y: 2.5, z: 2.5 };
-        let heartBase = 1.0, heartSub = 0.5, animTimer1, animTimer2;
-
-        function generateOracle(month, day, hue, phaseName) {
-            let partA = "";
-            if (month === 2 && day === 3) partA = "在这抹月光浸染的丹宁冷冽中";
-            else if (phaseName === "赛博液态银") partA = "映照着冰冷的金属镜面波纹";
-            else if (phaseName === "高折射琉璃" || phaseName === "灵动水态") {
-                if (hue < 50/360) partA = "借由这束琥珀色琉璃的折射";
-                else if (hue < 170/360) partA = "于这片通透冰蓝的微光里";
-                else partA = "透过这层清澈异质的介质";
-            } else {
-                if (hue < 50/360) partA = "借由这束琥珀色的磷光";
-                else if (hue < 170/360) partA = "于这片清冷的幽蓝频段";
-                else if (hue < 250/360) partA = "在这抹哑光的丹宁色泽里";
-                else if (hue < 300/360) partA = "于这片异质的深紫魅影中";
-                else partA = "抚过这片褪色的低保真色彩";
-            }
-            const basesB = ["寻找通向自身之途的艰难", "啄破那层宿命定义的蛋壳", "忍受着孤独季风的洗礼", "穿透那些被同化的法则", "越过两极博弈的灰度地带", "在系统的缝隙中完成呼吸", "抵抗着数字洪流的平庸侵蚀", "完成对既定剧本的最终背叛"];
-            const partB = basesB[(month * day) % basesB.length];
-            const basesC = ["确立你唯一的精神主权。", "标定你躯壳外的精神原点。", "完成对自我的终极命名。", "确立那串无法复刻的坐标。", "它是系统无法模拟的密钥。"];
-            const partC = basesC[day % basesC.length];
-            return `${partA}，你正${partB}，${partC}`;
-        }
 
         function init3D() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 1.5, 8);
+            
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            // ⚠️ 核心修复 3：防止彩色杂点产生的颜色空间设置
+            renderer.outputColorSpace = 'srgb';
             document.body.appendChild(renderer.domElement);
             
-            const envCanvas = document.createElement('canvas'); envCanvas.width = 64; envCanvas.height = 64;
-            const envCtx = envCanvas.getContext('2d'); const envGrad = envCtx.createRadialGradient(32, 32, 0, 32, 32, 32); envGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); envGrad.addColorStop(1, 'rgba(10, 15, 20, 1)'); envCtx.fillStyle = envGrad; envCtx.fillRect(0, 0, 64, 64);
-            scene.environment = new THREE.CanvasTexture(envCanvas); scene.environment.mapping = THREE.EquirectangularReflectionMapping;
-
-            const linesGeometry = new THREE.BufferGeometry(); const positions = new Float32Array(5500 * 18); 
-            for (let i = 0; i < 5500; i++) { 
-                const x = Math.random() * 80 - 40; const z = Math.random() * 50 - 25; const h = 1.0 + Math.random() * 1.5;
-                const p0y = -1, p1y = -1 + h*0.33, p2y = -1 + h*0.66, p3y = -1 + h;
-                positions[i*18+0] = x; positions[i*18+1] = p0y; positions[i*18+2] = z;
-                positions[i*18+3] = x; positions[i*18+4] = p1y; positions[i*18+5] = z;
-                positions[i*18+6] = x; positions[i*18+7] = p1y; positions[i*18+8] = z;
-                positions[i*18+9] = x; positions[i*18+10]= p2y; positions[i*18+11]= z;
-                positions[i*18+12]= x; positions[i*18+13]= p2y; positions[i*18+14]= z;
-                positions[i*18+15]= x; positions[i*18+16]= p3y; positions[i*18+17]= z;
-            }
-            linesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            linesGrass = new THREE.LineSegments(linesGeometry, new THREE.LineBasicMaterial({ color: 0xcceeff, transparent: true, opacity: 0.35 }));
-            scene.add(linesGrass);
-
-            // ⚠️ 修复 2：128px 纹理根除彩点
+            // 光斑纹理生成：使用更纯净的高斯模糊
             const pCanvas = document.createElement('canvas'); pCanvas.width = 128; pCanvas.height = 128;
-            const pCtx = pCanvas.getContext('2d'); const pGrad = pCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
-            pGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); pGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)'); pGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            pCtx.fillStyle = pGrad; pCtx.fillRect(0, 0, 128, 128);
-            const pTexture = new THREE.CanvasTexture(pCanvas); pTexture.minFilter = THREE.LinearFilter;
+            const pCtx = pCanvas.getContext('2d');
+            const grad = pCtx.createRadialGradient(64, 64, 0, 64, 64, 60);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            grad.addColorStop(0.3, 'rgba(255, 255, 255, 0.4)');
+            grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            pCtx.fillStyle = grad; pCtx.fillRect(0, 0, 128, 128);
+            const pTexture = new THREE.CanvasTexture(pCanvas);
 
-            const bokehGeometry = new THREE.BufferGeometry(); const bokehPos = new Float32Array(140 * 3);
-            for(let i = 0; i < 140; i++) { bokehPos[i*3] = (Math.random() - 0.5) * 35; bokehPos[i*3+1] = (Math.random() - 0.5) * 35; bokehPos[i*3+2] = Math.random() * 18 - 15; }
-            bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPos, 3));
-            bokehParticles = new THREE.Points(bokehGeometry, new THREE.PointsMaterial({ color: 0xffffff, size: 0.35, sizeAttenuation: true, transparent: true, opacity: 0.85, map: pTexture, depthWrite: false, blending: THREE.AdditiveBlending }));
+            // ⚠️ 核心修复 4：光斑数量减少并防止贴脸
+            const bokehCount = 126; // 减少10%
+            const bokehPos = new Float32Array(bokehCount * 3);
+            for(let i = 0; i < bokehCount; i++) {
+                bokehPos[i*3] = (Math.random() - 0.5) * 35;
+                bokehPos[i*3+1] = (Math.random() - 0.5) * 35;
+                bokehPos[i*3+2] = Math.random() * 15 - 18; // 强制推远，防止贴脸
+            }
+            const bokehGeo = new THREE.BufferGeometry();
+            bokehGeo.setAttribute('position', new THREE.BufferAttribute(bokehPos, 3));
+            bokehParticles = new THREE.Points(bokehGeo, new THREE.PointsMaterial({
+                color: 0xffffff, size: 0.18, // 尺寸限制在1/5以内
+                map: pTexture, transparent: true, opacity: 0.6,
+                blending: THREE.AdditiveBlending, depthWrite: false
+            }));
             scene.add(bokehParticles);
 
-            ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
-            new THREE.OBJLoader().load('flower.obj', (o) => { o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); const box = new THREE.Box3().setFromObject(o); o.position.sub(box.getCenter(new THREE.Vector3())); metalFlower = new THREE.Group(); metalFlower.add(o); metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); metalFlower.position.y = 1.5; metalFlower.visible = false; scene.add(metalFlower); });
-            ghostLight = new THREE.PointLight(0xffffff, 0, 12); scene.add(ghostLight); scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            
-            window.addEventListener('resize', onWindowResize);
-            window.addEventListener('mousemove', (e) => { mouse.x = (e.clientX/window.innerWidth)*2-1; mouse.y = -(e.clientY/window.innerHeight)*2+1; });
-            window.addEventListener('touchmove', (e) => { if(e.touches.length>0) { mouse.x=(e.touches[0].clientX/window.innerWidth)*2-1; mouse.y=-(e.touches[0].clientY/window.innerHeight)*2+1; } }, { passive: true });
-            animate();
-        }
-
-        function updateLinesGrass(time) {
-            const pos = linesGrass.geometry.attributes.position.array;
-            for (let i = 0; i < 5500; i++) {
-                const baseX = pos[i*18 + 0]; const z = pos[i*18 + 2]; const wind = Math.sin(time * 1.5 + z * 0.2); const mouseAvoid = gardenActive ? mouse.x * 1.5 : 0; const totalOffset = wind + mouseAvoid;
-                pos[i*18 + 3] = baseX + totalOffset * 0.08; pos[i*18 + 9] = baseX + totalOffset * 0.3; pos[i*18 + 15] = baseX + totalOffset * 0.8;
+            // 草地与环境
+            const linesGeo = new THREE.BufferGeometry(); const positions = new Float32Array(5000 * 18);
+            for(let i=0; i<5000; i++) {
+                const x = Math.random()*80-40; const z = Math.random()*50-25; const h = 1.0+Math.random()*1.5;
+                positions[i*18+0]=x; positions[i*18+1]=-1; positions[i*18+2]=z;
+                positions[i*18+15]=x; positions[i*18+16]=-1+h; positions[i*18+17]=z;
             }
-            linesGrass.geometry.attributes.position.needsUpdate = true;
+            linesGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            linesGrass = new THREE.LineSegments(linesGeo, new THREE.LineBasicMaterial({ color: 0xcceeff, transparent: true, opacity: 0.3 }));
+            scene.add(linesGrass);
+
+            ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
+            new THREE.OBJLoader().load('flower.obj', (o) => {
+                o.traverse(c => { if(c.isMesh) c.material = ghostMaterial; });
+                metalFlower = new THREE.Group(); metalFlower.add(o);
+                metalFlower.position.y = 1.5; metalFlower.visible = false; scene.add(metalFlower);
+            });
+
+            ghostLight = new THREE.PointLight(0xffffff, 0, 15); scene.add(ghostLight);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            animate();
         }
 
         function animate() {
             requestAnimationFrame(animate); const time = performance.now() * 0.001;
-            if(linesGrass) updateLinesGrass(time);
-            if(bokehParticles) { bokehParticles.rotation.y = time * 0.03 + (isAwakening ? 0.08 : 0); bokehParticles.position.y = Math.sin(time * 0.5) * 0.5; }
-            if(metalFlower && metalFlower.visible) { 
-                if(isAwakening) { currentScale.x += (targetScale.x - currentScale.x) * 0.06; currentScale.y += (targetScale.y - currentScale.y) * 0.06; currentScale.z += (targetScale.z - currentScale.z) * 0.06; metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); metalFlower.rotation.y += 0.25; metalFlower.rotation.z += 0.05; if (Math.abs(targetScale.y - currentScale.y) < 0.05) isAwakening = false;
-                } else if(gardenActive) { targetFollow.set(mouse.x * 4, mouse.y * 3 + 1.5, 5); metalFlower.lookAt(targetFollow); metalFlower.rotation.z += 0.002; } else { metalFlower.rotation.y += 0.003; }
-                const breathOffset = Math.sin(time * heartBase) * 0.15 + Math.sin(time * heartSub) * 0.05; metalFlower.position.y = 1.5 + breathOffset;
-                if(gardenActive) ghostLight.intensity = 1.5 + Math.sin(time * heartBase * 2) * 0.5; ghostLight.position.copy(metalFlower.position);
+            if(linesGrass) {
+                const pos = linesGrass.geometry.attributes.position.array;
+                for(let i=0; i<5000; i++) { pos[i*18+15] += Math.sin(time+pos[i*18+2]*0.2)*0.005; }
+                linesGrass.geometry.attributes.position.needsUpdate = true;
+            }
+            if(bokehParticles) { 
+                bokehParticles.rotation.y = time * 0.02; 
+                bokehParticles.position.y = Math.sin(time*0.5)*0.2;
+            }
+            if(metalFlower && metalFlower.visible) {
+                if(isAwakening) {
+                    currentScale.x += (targetScale.x - currentScale.x)*0.05;
+                    currentScale.y += (targetScale.y - currentScale.y)*0.05;
+                    metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.x);
+                    metalFlower.rotation.y += 0.15;
+                    if(Math.abs(targetScale.y - currentScale.y)<0.01) isAwakening=false;
+                } else {
+                    metalFlower.rotation.y += 0.005;
+                    metalFlower.position.y = 1.5 + Math.sin(time)*0.1;
+                }
             }
             renderer.render(scene, camera);
         }
 
-        function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
-        function showInput() { document.getElementById('intro-box').style.display = 'none'; document.getElementById('dive-btn').style.display = 'none'; document.getElementById('birthday-ui').style.display = 'flex'; setTimeout(() => { document.getElementById('birthday-ui').style.opacity = '1'; }, 50); document.getElementById('bday-input').focus(); }
-        function startOracleTimer() { clearTimeout(animTimer1); clearTimeout(animTimer2); const og = document.getElementById('oracle-group'); const qe = document.getElementById('ghost-quote'); animTimer1 = setTimeout(() => { og.classList.add('dissolve-anim'); animTimer2 = setTimeout(() => { og.style.display = 'none'; qe.style.display = 'block'; qe.classList.add('fade-in-anim'); }, 2500); }, 15000); }
-        function restoreOracle() { const og = document.getElementById('oracle-group'); const qe = document.getElementById('ghost-quote'); qe.style.display = 'none'; qe.classList.remove('fade-in-anim'); og.style.display = 'block'; og.classList.remove('dissolve-anim'); void og.offsetWidth; startOracleTimer(); }
+        function showInput() { document.getElementById('intro-box').style.display='none'; document.getElementById('dive-btn').style.display='none'; document.getElementById('birthday-ui').style.display='flex'; setTimeout(()=>document.getElementById('birthday-ui').style.opacity='1',50); }
 
         function awakenGhost() {
-            const inputVal = document.getElementById('bday-input').value; if(inputVal.length !== 4) return;
-            const month = parseInt(inputVal.substring(0, 2)), day = parseInt(inputVal.substring(2, 4));
-            if(month < 1 || month > 12 || day < 1 || day > 31) return;
-            let calcMonth = month, calcDay = day; if (inputVal === "0101") { calcMonth = 6; calcDay = 16; } else if (inputVal === "0616") { calcMonth = 1; calcDay = 1; }
-            let colorDesc = "", phaseName = "", finalHue = 0;
-            ghostMaterial.color.set('#fff'); ghostMaterial.emissive.set('#000'); ghostMaterial.metalness = 0; ghostMaterial.roughness = 0.5; ghostMaterial.transmission = 0; ghostMaterial.ior = 1.5; ghostMaterial.thickness = 0; ghostMaterial.opacity = 1;
-
-            if (inputVal === "0203") {
-                const uniqueColor = new THREE.Color().setHSL(0.645, 0.45, 0.8);
-                ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; colorDesc = "月光浸染的丹宁蓝频段"; phaseName = "暗物质瓷"; finalHue = 0.645;
-                // ⚠️ 修复 3：0203 宽度压缩 10%
-                targetScale.x = (1.3 + (month / 12) * 3.0) * 0.9;
+            const inputVal = document.getElementById('bday-input').value; if(inputVal.length!==4) return;
+            const month = parseInt(inputVal.substring(0,2)), day = parseInt(inputVal.substring(2,4));
+            
+            // 0203 专用逻辑
+            if(inputVal === "0203") {
+                ghostMaterial.color.set('#b0c4de'); ghostMaterial.emissive.set('#4682b4');
+                targetScale.x = 2.8 * 0.9; targetScale.y = 3.2;
             } else {
-                let rawHue = ((calcMonth - 1) * 31 + calcDay) % 360; if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360;
-                finalHue = rawHue / 360; const saturation = 0.2 + (calcDay / 31) * 0.25; const lightness = 0.35 + (calcMonth % 3) * 0.15; const uniqueColor = new THREE.Color().setHSL(finalHue, saturation, lightness);
-                if (rawHue < 50) colorDesc = "琥珀金频段"; else if (rawHue < 80) colorDesc = "微光绿频段"; else if (rawHue < 170) colorDesc = "深海的冰蓝频段"; else if (rawHue < 250) colorDesc = "丹宁频段"; else if (rawHue < 300) colorDesc = "魅影紫频段"; else colorDesc = "千禧粉频段";
-                const phaseVal = (calcMonth * 7 + calcDay * 11) % 6;
-                ghostMaterial.opacity = 1.0;
-                if (phaseVal === 1) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 0.6; ghostMaterial.ior = 1.33; ghostMaterial.thickness = 1.5; phaseName = "灵动水态";
-                } else if (phaseVal === 2) { ghostMaterial.color.copy(uniqueColor).multiplyScalar(0.4); ghostMaterial.transmission = 0.7; ghostMaterial.ior = 1.55; ghostMaterial.roughness = 0.02; ghostMaterial.thickness = 2.0; ghostMaterial.attenuationColor = uniqueColor; ghostMaterial.attenuationDistance = 0.5; phaseName = "高折射琉璃"; ghostLight.intensity = 0.4;
-                } else { ghostMaterial.color.set('#1a1a1a'); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.roughness = 0.9; phaseName = "暗物质瓷"; }
-                ghostLight.color.copy(uniqueColor); if(phaseVal!==2) ghostLight.intensity = 2.0;
-                targetScale.x = 1.3 + (month / 12) * 3.0;
+                ghostMaterial.color.setHSL(month/12, 0.3, 0.5);
+                targetScale.x = 1.5 + (month/12)*2.5; targetScale.y = 1.5 + (day/31)*3;
             }
-            ghostMaterial.needsUpdate = true; targetScale.y = 1.3 + (day / 31) * 3.5; targetScale.z = targetScale.x; metalFlower.visible = true; isAwakening = true; document.getElementById('ui-layer').style.opacity = '0'; setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500);
-            document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：${phaseName} | 色谱：${colorDesc} ]`;
-            document.getElementById('ghost-oracle').innerHTML = generateOracle(month, day, finalHue, phaseName);
-            // ⚠️ 修正文案：删除“一个”
-            document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
-            document.getElementById('ghost-info').style.opacity = '1'; gardenActive = true; startOracleTimer();
+            
+            metalFlower.visible = true; isAwakening = true;
+            document.getElementById('ui-layer').style.opacity='0';
+            setTimeout(()=>document.getElementById('ui-layer').style.display='none', 1500);
+            
+            document.getElementById('ghost-coord').innerText = `[ 坐标：${inputVal} | 状态：觉醒 ]`;
+            document.getElementById('ghost-oracle').innerText = `在这抹微光浸染的频率中，你正穿透宿命定义的壳，寻找通向自身之途的艰难，并最终确立你唯一的精神主权。`;
+            document.getElementById('ghost-unique').innerText = `在物理世界，${inputVal} 也许只是时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
+            document.getElementById('ghost-info').style.opacity = '1';
+            gardenActive = true;
         }
-        // ⚠️ 修复 1：移动端监听
-        const awakenBtn = document.getElementById('awaken-btn');
-        awakenBtn.addEventListener('click', awakenGhost);
-        awakenBtn.addEventListener('touchstart', (e) => { e.preventDefault(); awakenGhost(); }, { passive: false });
+
         init3D();
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
