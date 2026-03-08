@@ -43,23 +43,23 @@
         #oracle-group { will-change: transform, opacity, filter, letter-spacing; }
         .ghost-header { font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); font-family: monospace; letter-spacing: 2px; font-weight: 400; white-space: nowrap; }
         
-        /* ⚠️ 修正 1：判词折行，适配移动端 */
+        /* ⚠️ 修正 1：判词移动端限制在2行内 */
         #ghost-oracle { 
             font-size: clamp(9px, 2.6vw, 12.5px); color: #eeeeee; font-weight: 300; 
-            letter-spacing: 1.5px; line-height: 1.8; 
-            white-space: normal; /* 允许换行 */
-            word-break: keep-all; /* 尽量在逗号等符号处换行 */
-            display: inline-block; width: 100%;
-        }
-        
-        /* ⚠️ 修正 2：底部小字加粗到 500 */
-        .ghost-footer { 
-            font-size: clamp(9px, 2.2vw, 12px); color: rgba(255,255,255,0.4); 
-            margin-top: 15px; letter-spacing: 1px; 
-            font-weight: 500; /* 加粗 */
+            letter-spacing: 1.5px; line-height: 1.6; 
             white-space: nowrap; 
         }
+        @media screen and (max-width: 768px) {
+            #ghost-oracle {
+                white-space: normal;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+        }
 
+        .ghost-footer { font-size: clamp(9px, 2.2vw, 12px); color: rgba(255,255,255,0.4); margin-top: 15px; letter-spacing: 1px; font-weight: 300; white-space: nowrap; }
         #ghost-quote { font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; display: none; opacity: 0; font-style: italic; line-height: 1.9; pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease; }
         @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; } 100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; } }
         .dissolve-anim { animation: windDissolve 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
@@ -90,7 +90,7 @@
         </div>
         <div id="ghost-quote" onclick="restoreOracle()">
             <div style="display:block; white-space:nowrap; padding-bottom:2px;">“我们如今仿佛对镜观看，模糊不清，到那时就要面对面了，</div>
-            <div style="display:block; white-space:nowrap;">我如今所知道的有限，到那时就全知道，如同造物主知道我一样。”</div>
+            <div style="display:block; white-space:nowrap;">我现在所知道的有限，到那时就全知道，如同造物主知道我一样。”</div>
         </div>
     </div>
 
@@ -133,9 +133,7 @@
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            
-            // ⚠️ 修正 3：防止彩色杂点产生
-            renderer.outputColorSpace = 'srgb'; 
+            renderer.outputColorSpace = 'srgb';
             document.body.appendChild(renderer.domElement);
             
             const envCanvas = document.createElement('canvas'); envCanvas.width = 64; envCanvas.height = 64;
@@ -224,9 +222,21 @@
                 ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; colorDesc = "月光浸染的丹宁蓝频段"; phaseName = "暗物质瓷"; finalHue = 0.645;
                 targetScale.x = (1.3 + (month / 12) * 3.0) * 0.9;
             } else {
-                let rawHue = ((calcMonth - 1) * 31 + calcDay) % 360; if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360;
-                finalHue = rawHue / 360; const saturation = 0.2 + (calcDay / 31) * 0.25; const lightness = 0.35 + (calcMonth % 3) * 0.15; const uniqueColor = new THREE.Color().setHSL(finalHue, saturation, lightness);
-                if (rawHue < 50) colorDesc = "琥珀金频段"; else if (rawHue < 80) colorDesc = "微光绿频段"; else if (rawHue < 170) colorDesc = "深海的冰蓝频段"; else if (rawHue < 250) colorDesc = "丹宁频段"; else if (rawHue < 300) colorDesc = "魅影紫频段"; else colorDesc = "千禧粉频段";
+                // ⚠️ 修正 3：增强全局色彩差异化
+                let rawHue = ((calcMonth - 1) * 35 + calcDay * 1.5) % 360; 
+                if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 60) % 360;
+                finalHue = rawHue / 360;
+                const saturation = 0.25 + (calcDay / 31) * 0.3; 
+                const lightness = 0.3 + (calcMonth % 4) * 0.12;
+                const uniqueColor = new THREE.Color().setHSL(finalHue, saturation, lightness);
+                
+                if (rawHue < 50) colorDesc = "琥珀金频段"; 
+                else if (rawHue < 110) colorDesc = "微光绿频段"; 
+                else if (rawHue < 190) colorDesc = "深海冰蓝频段";
+                else if (rawHue < 250) colorDesc = "丹宁蓝频段"; 
+                else if (rawHue < 310) colorDesc = "魅影紫频段"; 
+                else colorDesc = "千禧粉频段";
+
                 const phaseVal = (calcMonth * 7 + calcDay * 11) % 6;
                 ghostMaterial.opacity = 1.0;
                 if (phaseVal === 1) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 0.6; ghostMaterial.ior = 1.33; ghostMaterial.thickness = 1.5; phaseName = "灵动水态";
