@@ -42,8 +42,24 @@
         #ghost-info { position: fixed; bottom: clamp(20px, 5vh, 40px); left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.9); text-align: center; font-weight: 300; line-height: 1.8; opacity: 0; transition: opacity 2.5s ease; z-index: 100; pointer-events: none; width: 95vw; max-width: 750px; }
         #oracle-group { will-change: transform, opacity, filter, letter-spacing; }
         .ghost-header { font-size: clamp(9px, 2.2vw, 12px); color: #ffffff; margin-bottom: clamp(10px, 2.5vh, 15px); font-family: monospace; letter-spacing: 2px; font-weight: 400; white-space: nowrap; }
-        #ghost-oracle { font-size: clamp(9px, 2.6vw, 12.5px); color: #eeeeee; font-weight: 300; letter-spacing: 1.5px; line-height: 2.2; white-space: nowrap; }
-        .ghost-footer { font-size: clamp(9px, 2.2vw, 12px); color: rgba(255,255,255,0.4); margin-top: 15px; letter-spacing: 1px; font-weight: 300; white-space: nowrap; }
+        
+        /* ⚠️ 修正 1：判词折行，适配移动端 */
+        #ghost-oracle { 
+            font-size: clamp(9px, 2.6vw, 12.5px); color: #eeeeee; font-weight: 300; 
+            letter-spacing: 1.5px; line-height: 1.8; 
+            white-space: normal; /* 允许换行 */
+            word-break: keep-all; /* 尽量在逗号等符号处换行 */
+            display: inline-block; width: 100%;
+        }
+        
+        /* ⚠️ 修正 2：底部小字加粗到 500 */
+        .ghost-footer { 
+            font-size: clamp(9px, 2.2vw, 12px); color: rgba(255,255,255,0.4); 
+            margin-top: 15px; letter-spacing: 1px; 
+            font-weight: 500; /* 加粗 */
+            white-space: nowrap; 
+        }
+
         #ghost-quote { font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; display: none; opacity: 0; font-style: italic; line-height: 1.9; pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease; }
         @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; } 100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; } }
         .dissolve-anim { animation: windDissolve 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
@@ -117,6 +133,9 @@
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            // ⚠️ 修正 3：防止彩色杂点产生
+            renderer.outputColorSpace = 'srgb'; 
             document.body.appendChild(renderer.domElement);
             
             const envCanvas = document.createElement('canvas'); envCanvas.width = 64; envCanvas.height = 64;
@@ -207,7 +226,7 @@
             } else {
                 let rawHue = ((calcMonth - 1) * 31 + calcDay) % 360; if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 40) % 360;
                 finalHue = rawHue / 360; const saturation = 0.2 + (calcDay / 31) * 0.25; const lightness = 0.35 + (calcMonth % 3) * 0.15; const uniqueColor = new THREE.Color().setHSL(finalHue, saturation, lightness);
-                if (rawHue < 50) colorDesc = "琥珀金频段"; else if (rawHue < 80) colorDesc = "微光绿频段"; else if (rawHue < 170) colorDesc = "冰蓝频段"; else if (rawHue < 250) colorDesc = "丹宁频段"; else if (rawHue < 300) colorDesc = "魅影紫频段"; else colorDesc = "千禧粉频段";
+                if (rawHue < 50) colorDesc = "琥珀金频段"; else if (rawHue < 80) colorDesc = "微光绿频段"; else if (rawHue < 170) colorDesc = "深海的冰蓝频段"; else if (rawHue < 250) colorDesc = "丹宁频段"; else if (rawHue < 300) colorDesc = "魅影紫频段"; else colorDesc = "千禧粉频段";
                 const phaseVal = (calcMonth * 7 + calcDay * 11) % 6;
                 ghostMaterial.opacity = 1.0;
                 if (phaseVal === 1) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 0.6; ghostMaterial.ior = 1.33; ghostMaterial.thickness = 1.5; phaseName = "灵动水态";
@@ -222,6 +241,10 @@
             document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
             document.getElementById('ghost-info').style.opacity = '1'; gardenActive = true; startOracleTimer();
         }
+        const awakenBtn = document.getElementById('awaken-btn');
+        awakenBtn.addEventListener('click', awakenGhost);
+        awakenBtn.addEventListener('touchstart', (e) => { e.preventDefault(); awakenGhost(); }, { passive: false });
+        init3D();
     </script>
 </body>
 </html>
