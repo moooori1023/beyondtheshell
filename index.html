@@ -51,12 +51,14 @@
         @media screen and (max-width: 768px) {
             #ghost-oracle {
                 white-space: normal;
-                display: block;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
         }
 
-        /* ⚠️ 修正 4：灰色小字加粗 */
-        .ghost-footer { font-size: clamp(9px, 2.2vw, 12px); color: rgba(255,255,255,0.4); margin-top: 15px; letter-spacing: 1px; font-weight: 500; white-space: nowrap; }
+        .ghost-footer { font-size: clamp(9px, 2.2vw, 12px); color: rgba(255,255,255,0.4); margin-top: 15px; letter-spacing: 1px; font-weight: 300; white-space: nowrap; }
         #ghost-quote { font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; display: none; opacity: 0; font-style: italic; line-height: 1.9; pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease; }
         @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; } 100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; } }
         .dissolve-anim { animation: windDissolve 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
@@ -103,30 +105,31 @@
 
         function generateOracle(month, day, hue, phaseName) {
             let partA = "";
+            const h = hue * 360;
+            
+            // ⚠️ 物理参数同步逻辑
             if (month === 2 && day === 3) partA = "在这抹月光浸染的丹宁冷冽中";
             else if (phaseName === "赛博液态银") partA = "映照着冰冷的金属镜面波纹";
+            else if (phaseName === "哑光白瓷") partA = "于这片纯净无暇的白皙频段";
+            else if (phaseName === "暗物质瓷" && h < 10) partA = "陷入这抹深邃无底的永夜玄色";
             else if (phaseName === "高折射琉璃" || phaseName === "灵动水态") {
-                if (hue < 50/360) partA = "借由这束琥珀色琉璃的折射";
-                else if (hue < 170/360) partA = "于这片通透冰蓝的微光里";
+                if (h < 50) partA = "借由这束琥珀色琉璃的折射";
+                else if (h < 190) partA = "于这片通透冰蓝的微光里";
                 else partA = "透过这层清澈异质的介质";
             } else {
-                if (hue < 50/360) partA = "借由这束琥珀色的磷光";
-                else if (hue < 170/360) partA = "于这片清冷的幽蓝频段";
-                else if (hue < 250/360) partA = "在这抹哑光的丹宁色泽里";
-                else if (hue < 300/360) partA = "于这片异质的深紫魅影中";
-                else partA = "抚过这片褪色的低保真色彩";
+                if (h > 320 || h < 20) partA = "抚过这抹温柔的千禧粉色泽";
+                else if (h < 50) partA = "借由这束琥珀色的磷光";
+                else if (h < 110) partA = "于这片黯淡的微光绿频段";
+                else if (h < 190) partA = "于这片清冷的幽蓝频段";
+                else if (h < 260) partA = "在这抹哑光的丹宁色泽里";
+                else partA = "抚过这片褪色的深紫魅影";
             }
+
             const basesB = ["寻找通向自身之途的艰难", "啄破那层宿命定义的蛋壳", "忍受着孤独季风的洗礼", "穿透那些被同化的法则", "越过两极博弈的灰度地带", "在系统的缝隙中完成呼吸", "抵抗着数字洪流的平庸侵蚀", "完成对既定剧本的最终背叛"];
             const partB = basesB[(month * day) % basesB.length];
             const basesC = ["确立你唯一的精神主权。", "标定你躯壳外的精神原点。", "完成对自我的终极命名。", "确立那串无法复刻的坐标。", "它是系统无法模拟的密钥。"];
             const partC = basesC[day % basesC.length];
-            
-            let fullOracle = `${partA}，你正${partB}，${partC}`;
-            // ⚠️ 修正 1：移动端第一个逗号处换行
-            if(window.innerWidth <= 768) {
-                fullOracle = fullOracle.replace("，", "，<br>");
-            }
-            return fullOracle;
+            return `${partA}，你正${partB}，${partC}`;
         }
 
         function init3D() {
@@ -136,7 +139,6 @@
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            // ⚠️ 修正 3：sRGB 编码解决光斑杂点
             renderer.outputColorSpace = 'srgb';
             document.body.appendChild(renderer.domElement);
             
@@ -165,10 +167,8 @@
             pCtx.fillStyle = pGrad; pCtx.fillRect(0, 0, 128, 128);
             const pTexture = new THREE.CanvasTexture(pCanvas); pTexture.minFilter = THREE.LinearFilter;
 
-            const bokehGeometry = new THREE.BufferGeometry(); 
-            // ⚠️ 修正 3：数量减少 10% (126)
-            const bokehPos = new Float32Array(126 * 3);
-            for(let i = 0; i < 126; i++) { bokehPos[i*3] = (Math.random() - 0.5) * 35; bokehPos[i*3+1] = (Math.random() - 0.5) * 35; bokehPos[i*3+2] = Math.random() * 18 - 15; }
+            const bokehGeometry = new THREE.BufferGeometry(); const bokehPos = new Float32Array(140 * 3);
+            for(let i = 0; i < 140; i++) { bokehPos[i*3] = (Math.random() - 0.5) * 35; bokehPos[i*3+1] = (Math.random() - 0.5) * 35; bokehPos[i*3+2] = Math.random() * 18 - 15; }
             bokehGeometry.setAttribute('position', new THREE.BufferAttribute(bokehPos, 3));
             bokehParticles = new THREE.Points(bokehGeometry, new THREE.PointsMaterial({ color: 0xffffff, size: 0.35, sizeAttenuation: true, transparent: true, opacity: 0.85, map: pTexture, depthWrite: false, blending: THREE.AdditiveBlending }));
             scene.add(bokehParticles);
@@ -227,38 +227,60 @@
                 const uniqueColor = new THREE.Color().setHSL(0.645, 0.45, 0.8);
                 ghostMaterial.color.copy(uniqueColor); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.metalness = 0.0; ghostMaterial.roughness = 0.9; ghostMaterial.emissiveIntensity = 0.3; ghostLight.color.copy(uniqueColor); ghostLight.intensity = 2.0; colorDesc = "月光浸染的丹宁蓝频段"; phaseName = "暗物质瓷"; finalHue = 0.645;
                 targetScale.x = (1.3 + (month / 12) * 3.0) * 0.9;
-            } 
-            // ⚠️ 修正 6：0616 液态金属通道
-            else if (inputVal === "0616") {
+            } else if (inputVal === "0616") {
                 ghostMaterial.color.set('#aaaaaa'); ghostMaterial.emissive.set('#555555'); ghostMaterial.metalness = 1.0; ghostMaterial.roughness = 0.05; phaseName = "赛博液态银"; colorDesc = "液态金属频段"; ghostLight.color.set('#ffffff'); ghostLight.intensity = 2.0; finalHue = 0;
                 targetScale.x = 1.3 + (month / 12) * 3.0;
-            }
-            else {
-                let rawHue = ((calcMonth - 1) * 35 + calcDay * 1.5) % 360; if (rawHue > 340 || rawHue < 20) rawHue = (rawHue + 60) % 360;
-                finalHue = rawHue / 360; const saturation = 0.25 + (calcDay / 31) * 0.3; const lightness = 0.3 + (calcMonth % 4) * 0.12; const uniqueColor = new THREE.Color().setHSL(finalHue, saturation, lightness);
-                if (rawHue < 50) colorDesc = "琥珀金频段"; else if (rawHue < 110) colorDesc = "微光绿频段"; else if (rawHue < 190) colorDesc = "深海冰蓝频段"; else if (rawHue < 250) colorDesc = "丹宁蓝频段"; else if (rawHue < 310) colorDesc = "魅影紫频段"; else colorDesc = "千禧粉频段";
-                const phaseVal = (calcMonth * 7 + calcDay * 11) % 6;
-                ghostMaterial.opacity = 1.0;
-                if (phaseVal === 1) { ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 0.6; ghostMaterial.ior = 1.33; ghostMaterial.thickness = 1.5; phaseName = "灵动水态";
-                } else if (phaseVal === 2) { ghostMaterial.color.copy(uniqueColor).multiplyScalar(0.4); ghostMaterial.transmission = 0.7; ghostMaterial.ior = 1.55; ghostMaterial.roughness = 0.02; ghostMaterial.thickness = 2.0; ghostMaterial.attenuationColor = uniqueColor; ghostMaterial.attenuationDistance = 0.5; phaseName = "高折射琉璃"; ghostLight.intensity = 0.4;
-                } else { ghostMaterial.color.set('#1a1a1a'); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.roughness = 0.9; phaseName = "暗物质瓷"; }
-                ghostLight.color.copy(uniqueColor); if(phaseVal!==2) ghostLight.intensity = 2.0;
+            } else {
+                // ⚠️ 修正 1：色彩算法重构，增加银、白、黑、千禧粉及混白效果
+                let rawHue = ((calcMonth - 1) * 35 + calcDay * 1.5 + (calcMonth * calcDay)) % 360; 
+                finalHue = rawHue / 360;
+                
+                const phaseChoice = (calcMonth * 7 + calcDay * 11) % 10;
+                const saturation = 0.2 + (calcDay / 31) * 0.2; 
+                const lightness = 0.35 + (calcMonth % 4) * 0.12; 
+                const uniqueColor = new THREE.Color().setHSL(finalHue, saturation, lightness);
+
+                if (phaseChoice === 0) { // 经典赛博白
+                    ghostMaterial.color.set('#eeeeee'); ghostMaterial.roughness = 0.1; ghostMaterial.metalness = 0.2; phaseName = "哑光白瓷"; colorDesc = "月牙白频段"; 
+                } else if (phaseChoice === 1) { // 赛博深邃黑
+                    ghostMaterial.color.set('#0a0a0a'); ghostMaterial.roughness = 0.8; ghostMaterial.metalness = 0.0; phaseName = "暗物质瓷"; colorDesc = "赛博黑频段";
+                } else if (phaseChoice === 2) { // 液态银
+                    ghostMaterial.color.set('#cccccc'); ghostMaterial.metalness = 1.0; ghostMaterial.roughness = 0.02; phaseName = "赛博液态银"; colorDesc = "液态金属频段";
+                } else if (rawHue > 320 || rawHue < 20) { // 千禧粉
+                    ghostMaterial.color.copy(uniqueColor); phaseName = "高折射琉璃"; colorDesc = "千禧粉频段";
+                } else {
+                    const phaseVal = phaseChoice % 6;
+                    if (phaseVal === 1) { 
+                        ghostMaterial.color.copy(uniqueColor); ghostMaterial.transmission = 0.6; ghostMaterial.ior = 1.33; ghostMaterial.thickness = 1.5; phaseName = "灵动水态";
+                    } else if (phaseVal === 2) { 
+                        ghostMaterial.color.copy(uniqueColor).multiplyScalar(0.4); ghostMaterial.transmission = 0.7; ghostMaterial.ior = 1.55; ghostMaterial.roughness = 0.02; ghostMaterial.thickness = 2.0; phaseName = "高折射琉璃"; ghostLight.intensity = 0.4;
+                    } else { 
+                        ghostMaterial.color.set('#1a1a1a'); ghostMaterial.emissive.copy(uniqueColor); ghostMaterial.roughness = 0.9; phaseName = "暗物质瓷"; 
+                    }
+                }
+                
+                // 自动生成色谱描述
+                if (!colorDesc) {
+                    if (rawHue < 50) colorDesc = "琥珀金频段"; 
+                    else if (rawHue < 110) colorDesc = "微光绿频段"; 
+                    else if (rawHue < 190) colorDesc = "深海冰蓝频段";
+                    else if (rawHue < 250) colorDesc = "丹宁蓝频段"; 
+                    else if (rawHue < 310) colorDesc = "魅影紫频段"; 
+                    else colorDesc = "千禧粉频段";
+                }
+                
+                ghostLight.color.copy(uniqueColor); if(ghostLight.intensity === 0) ghostLight.intensity = 2.0;
                 targetScale.x = 1.3 + (month / 12) * 3.0;
             }
-
-            // ⚠️ 修正 2：限制花朵最大比例（不得超过1/2移动端，1/4电脑端）
-            const maxS = window.innerWidth <= 768 ? 2.2 : 3.5;
-            ghostMaterial.needsUpdate = true; 
-            targetScale.y = Math.min(1.3 + (day / 31) * 3.5, maxS); 
-            targetScale.x = Math.min(targetScale.x, maxS);
-            targetScale.z = targetScale.x; 
-
-            metalFlower.visible = true; isAwakening = true; document.getElementById('ui-layer').style.opacity = '0'; setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500);
+            ghostMaterial.needsUpdate = true; targetScale.y = 1.3 + (day / 31) * 3.5; targetScale.z = targetScale.x; metalFlower.visible = true; isAwakening = true; document.getElementById('ui-layer').style.opacity = '0'; setTimeout(() => { document.getElementById('ui-layer').style.display = 'none'; }, 1500);
             document.getElementById('ghost-coord').innerHTML = `[ 坐标：${inputVal} | 相态：${phaseName} | 色谱：${colorDesc} ]`;
             document.getElementById('ghost-oracle').innerHTML = generateOracle(month, day, finalHue, phaseName);
             document.getElementById('ghost-unique').innerHTML = `在物理世界，${inputVal} 也许只是时间刻度；但在躯壳之外，这是系统无法复刻的绝对参数。`;
             document.getElementById('ghost-info').style.opacity = '1'; gardenActive = true; startOracleTimer();
         }
+        const awakenBtn = document.getElementById('awaken-btn');
+        awakenBtn.addEventListener('click', awakenGhost);
+        awakenBtn.addEventListener('touchstart', (e) => { e.preventDefault(); awakenGhost(); }, { passive: false });
         init3D();
     </script>
 </body>
