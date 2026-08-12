@@ -58,7 +58,6 @@
             }
         }
 
-        /* ⚠️ 修正 2：底部小字透明度由 0.4 提升至 0.7，显著增强清晰度 */
         .ghost-footer { font-size: clamp(9px, 2.2vw, 12px); color: rgba(255,255,255,0.7); margin-top: 15px; letter-spacing: 1px; font-weight: 500; white-space: nowrap; }
         #ghost-quote { font-size: clamp(9px, 2.6vw, 12.5px); color: #ffffff; font-weight: 400; letter-spacing: 1.2px; display: none; opacity: 0; font-style: italic; line-height: 1.9; pointer-events: auto; cursor: pointer; transition: opacity 0.3s ease; }
         @keyframes windDissolve { 0% { opacity: 1; filter: blur(0px); transform: translate3d(0, 0, 0) skewX(0deg); letter-spacing: 1.5px; } 100% { opacity: 0; filter: blur(12px); transform: translate3d(30px, -20px, 0) skewX(-10deg) scale(1.02); letter-spacing: 6px; } }
@@ -95,10 +94,12 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script>
         window.onload = () => { document.getElementById('fade-in-overlay').style.opacity = '0'; }
-        let scene, camera, renderer, linesGrass, metalFlower, bokehParticles;
+        
+        // 【关键修复 1】补全所有变量声明，防止严格模式抛错阻断程序运行
+        let scene, camera, renderer, linesGrass, metalFlower, bokehParticles, ghostMaterial, ghostLight;
         const mouse = new THREE.Vector2(), targetFollow = new THREE.Vector3();
         let gardenActive = false, isAwakening = false;
         let currentScale = { x: 2.5, y: 2.5, z: 2.5 }, targetScale = { x: 2.5, y: 2.5, z: 2.5 };
@@ -176,12 +177,20 @@
             ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
             new THREE.OBJLoader().load('flower.obj', (o) => { o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); const box = new THREE.Box3().setFromObject(o); o.position.sub(box.getCenter(new THREE.Vector3())); metalFlower = new THREE.Group(); metalFlower.add(o); metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); metalFlower.position.y = 1.5; metalFlower.visible = false; scene.add(metalFlower); });
             ghostLight = new THREE.PointLight(0xffffff, 0, 12); scene.add(ghostLight); scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            
             window.addEventListener('resize', onWindowResize);
             window.addEventListener('mousemove', (e) => { mouse.x = (e.clientX/window.innerWidth)*2-1; mouse.y = -(e.clientY/window.innerHeight)*2+1; });
             window.addEventListener('touchmove', (e) => { if(e.touches.length>0) { mouse.x=(e.touches[0].clientX/window.innerWidth)*2-1; mouse.y=-(e.touches[0].clientY/window.innerHeight)*2+1; } }, { passive: true });
+            
             const btn = document.getElementById('awaken-btn');
             btn.addEventListener('click', awakenGhost);
             btn.addEventListener('touchstart', (e) => { e.preventDefault(); awakenGhost(); }, { passive: false });
+            
+            // 【关键修复 2】加入回车监听，移动端体验更平滑
+            document.getElementById('bday-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') awakenGhost();
+            });
+
             animate();
         }
 
@@ -213,9 +222,26 @@
         function restoreOracle() { const og = document.getElementById('oracle-group'); const qe = document.getElementById('ghost-quote'); qe.style.display = 'none'; qe.classList.remove('fade-in-anim'); og.style.display = 'block'; og.classList.remove('dissolve-anim'); void og.offsetWidth; startOracleTimer(); }
 
         function awakenGhost() {
-            const inputVal = document.getElementById('bday-input').value; if(inputVal.length !== 4) return;
+            const inputVal = document.getElementById('bday-input').value; 
+            
+            // 【关键修复 3】提供直观拦截提示，避免无反应假死
+            if(inputVal.length !== 4) {
+                alert("请输入4位初始时间戳密钥（如：0203）");
+                return;
+            }
+            
             const month = parseInt(inputVal.substring(0, 2)), day = parseInt(inputVal.substring(2, 4));
-            if(month < 1 || month > 12 || day < 1 || day > 31) return;
+            if(month < 1 || month > 12 || day < 1 || day > 31) {
+                alert("系统无法识别该坐标，请输入有效的日期。");
+                return;
+            }
+
+            // 【关键修复 4】防御未加载完全造成的页面崩溃
+            if (!metalFlower) {
+                alert("躯壳数据仍在重组中（模型未加载完成），请稍等片刻再试...");
+                return;
+            }
+
             let calcMonth = month, calcDay = day; if (inputVal === "0101") { calcMonth = 6; calcDay = 16; } else if (inputVal === "0616") { calcMonth = 1; calcDay = 1; }
             let colorDesc = "", phaseName = "", finalHue = 0;
             ghostMaterial.color.set('#fff'); ghostMaterial.emissive.set('#000'); ghostMaterial.metalness = 0; ghostMaterial.roughness = 0.5; ghostMaterial.transmission = 0; ghostMaterial.ior = 1.5; ghostMaterial.thickness = 0; ghostMaterial.opacity = 1;
@@ -248,7 +274,6 @@
                 targetScale.x = 1.3 + (month / 12) * 3.0;
             }
             
-            // ⚠️ 修正 1：电脑端最大尺寸限定为 2.5，即约屏幕画面的 1/5
             const maxS = window.innerWidth <= 768 ? 2.2 : 2.5; 
             ghostMaterial.needsUpdate = true; 
             targetScale.y = Math.min(1.3 + (day / 31) * 3.5, maxS); 
