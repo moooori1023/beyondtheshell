@@ -37,7 +37,6 @@
         .btn-style { background: rgba(255, 255, 255, 0.9); color: #000; border: none; padding: clamp(10px, 2vh, 12px) clamp(30px, 6vw, 40px); border-radius: 30px; cursor: pointer; font-size: clamp(11px, 2.5vw, 13px); letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease; pointer-events: auto; }
         .btn-style:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.3); }
         
-        /* ⚠️ 新增：未就绪时的按钮状态 */
         .btn-disabled { opacity: 0.5; pointer-events: none; }
         
         #birthday-ui { display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; pointer-events: auto; text-align: center; }
@@ -82,7 +81,6 @@
         <button id="dive-btn" class="btn-style" onclick="showInput()">构建密钥</button>
         <div id="birthday-ui">
             <input type="text" id="bday-input" maxlength="4" placeholder="MMDD" autocomplete="off" pattern="\d*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
-            <!-- ⚠️ 按钮默认置灰并提示载入中 -->
             <button id="awaken-btn" class="btn-style btn-disabled">躯壳载入中...</button>
         </div>
     </div>
@@ -181,8 +179,8 @@
 
             ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
             
-            // ⚠️ 核心修复：直接从 jsDelivr 全球加速 CDN 拉取 GitHub 仓库里的模型文件
-            const modelUrl = 'https://cdn.jsdelivr.net/gh/mooooori1023/beyondtheshell@main/flower.obj';
+            // ⚠️ 正确修复：用户名 moooori1023 (4 个 o)
+            const modelUrl = 'https://cdn.jsdelivr.net/gh/moooori1023/beyondtheshell@main/flower.obj';
             
             new THREE.OBJLoader().load(modelUrl, (o) => { 
                 o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); 
@@ -195,7 +193,6 @@
                 metalFlower.visible = false; 
                 scene.add(metalFlower); 
                 
-                // 模型加载完成后，激活按钮并恢复文本
                 const awakenBtn = document.getElementById('awaken-btn');
                 awakenBtn.innerText = '唤醒 Ghost';
                 awakenBtn.classList.remove('btn-disabled');
