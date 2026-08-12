@@ -94,11 +94,11 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <!-- ⚠️ 这里替换成了最稳定的 unpkg 节点，解决加载被墙的问题 -->
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script>
         window.onload = () => { document.getElementById('fade-in-overlay').style.opacity = '0'; }
         
-        // 【关键修复 1】补全所有变量声明，防止严格模式抛错阻断程序运行
         let scene, camera, renderer, linesGrass, metalFlower, bokehParticles, ghostMaterial, ghostLight;
         const mouse = new THREE.Vector2(), targetFollow = new THREE.Vector3();
         let gardenActive = false, isAwakening = false;
@@ -186,7 +186,6 @@
             btn.addEventListener('click', awakenGhost);
             btn.addEventListener('touchstart', (e) => { e.preventDefault(); awakenGhost(); }, { passive: false });
             
-            // 【关键修复 2】加入回车监听，移动端体验更平滑
             document.getElementById('bday-input').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') awakenGhost();
             });
@@ -224,7 +223,6 @@
         function awakenGhost() {
             const inputVal = document.getElementById('bday-input').value; 
             
-            // 【关键修复 3】提供直观拦截提示，避免无反应假死
             if(inputVal.length !== 4) {
                 alert("请输入4位初始时间戳密钥（如：0203）");
                 return;
@@ -236,7 +234,6 @@
                 return;
             }
 
-            // 【关键修复 4】防御未加载完全造成的页面崩溃
             if (!metalFlower) {
                 alert("躯壳数据仍在重组中（模型未加载完成），请稍等片刻再试...");
                 return;
