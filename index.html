@@ -36,6 +36,10 @@
         #intro-box p { font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; letter-spacing: 2px; color: rgba(255,255,255,0.85); }
         .btn-style { background: rgba(255, 255, 255, 0.9); color: #000; border: none; padding: clamp(10px, 2vh, 12px) clamp(30px, 6vw, 40px); border-radius: 30px; cursor: pointer; font-size: clamp(11px, 2.5vw, 13px); letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease; pointer-events: auto; }
         .btn-style:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.3); }
+        
+        /* ⚠️ 新增：未就绪时的按钮状态 */
+        .btn-disabled { opacity: 0.5; pointer-events: none; }
+        
         #birthday-ui { display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; pointer-events: auto; text-align: center; }
         #bday-input { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.6); color: #fff; font-size: clamp(26px, 6vw, 35px); text-align: center; width: clamp(140px, 40vw, 180px); letter-spacing: 12px; outline: none; font-family: 'Courier New', Courier, monospace; font-weight: 300; margin-bottom: 35px; padding-bottom: 5px; transition: border-color 0.3s ease; }
         #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
@@ -78,7 +82,8 @@
         <button id="dive-btn" class="btn-style" onclick="showInput()">构建密钥</button>
         <div id="birthday-ui">
             <input type="text" id="bday-input" maxlength="4" placeholder="MMDD" autocomplete="off" pattern="\d*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
-            <button id="awaken-btn" class="btn-style">唤醒 Ghost</button>
+            <!-- ⚠️ 按钮默认置灰并提示载入中 -->
+            <button id="awaken-btn" class="btn-style btn-disabled">躯壳载入中...</button>
         </div>
     </div>
     <div id="ghost-info">
@@ -94,7 +99,6 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- ⚠️ 这里替换成了最稳定的 unpkg 节点，解决加载被墙的问题 -->
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script>
         window.onload = () => { document.getElementById('fade-in-overlay').style.opacity = '0'; }
@@ -144,6 +148,7 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.outputColorSpace = 'srgb';
             document.body.appendChild(renderer.domElement);
+            
             const envCanvas = document.createElement('canvas'); envCanvas.width = 64; envCanvas.height = 64;
             const envCtx = envCanvas.getContext('2d'); const envGrad = envCtx.createRadialGradient(32, 32, 0, 32, 32, 32); envGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); envGrad.addColorStop(1, 'rgba(10, 15, 20, 1)'); envCtx.fillStyle = envGrad; envCtx.fillRect(0, 0, 64, 64);
             scene.environment = new THREE.CanvasTexture(envCanvas); scene.environment.mapping = THREE.EquirectangularReflectionMapping;
@@ -175,7 +180,27 @@
             scene.add(bokehParticles);
 
             ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
-            new THREE.OBJLoader().load('flower.obj', (o) => { o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); const box = new THREE.Box3().setFromObject(o); o.position.sub(box.getCenter(new THREE.Vector3())); metalFlower = new THREE.Group(); metalFlower.add(o); metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); metalFlower.position.y = 1.5; metalFlower.visible = false; scene.add(metalFlower); });
+            
+            // ⚠️ 核心修复：直接从 jsDelivr 全球加速 CDN 拉取 GitHub 仓库里的模型文件
+            const modelUrl = 'https://cdn.jsdelivr.net/gh/mooooori1023/beyondtheshell@main/flower.obj';
+            
+            new THREE.OBJLoader().load(modelUrl, (o) => { 
+                o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); 
+                const box = new THREE.Box3().setFromObject(o); 
+                o.position.sub(box.getCenter(new THREE.Vector3())); 
+                metalFlower = new THREE.Group(); 
+                metalFlower.add(o); 
+                metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); 
+                metalFlower.position.y = 1.5; 
+                metalFlower.visible = false; 
+                scene.add(metalFlower); 
+                
+                // 模型加载完成后，激活按钮并恢复文本
+                const awakenBtn = document.getElementById('awaken-btn');
+                awakenBtn.innerText = '唤醒 Ghost';
+                awakenBtn.classList.remove('btn-disabled');
+            });
+
             ghostLight = new THREE.PointLight(0xffffff, 0, 12); scene.add(ghostLight); scene.add(new THREE.AmbientLight(0xffffff, 0.6));
             
             window.addEventListener('resize', onWindowResize);
