@@ -11,12 +11,20 @@
             font-family: 'PingFang SC', 'Helvetica Neue', 'Hiragino Sans GB', sans-serif; color: #fff; 
             touch-action: none;
         }
-        #bg-image {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 110vh;
-            background-image: url('bg.jpg'); 
-            background-size: cover; background-position: center bottom;
+        
+        /* ⬇️ 修改点 1：全新的视频背景样式 */
+        #bg-video {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 110vh;
+            object-fit: cover; 
+            object-position: center bottom; 
             z-index: 0;
+            pointer-events: none; /* 防止用户手指误触点停视频 */
         }
+
         canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
         #glass-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -36,9 +44,6 @@
         #intro-box p { font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; letter-spacing: 2px; color: rgba(255,255,255,0.85); }
         .btn-style { background: rgba(255, 255, 255, 0.9); color: #000; border: none; padding: clamp(10px, 2vh, 12px) clamp(30px, 6vw, 40px); border-radius: 30px; cursor: pointer; font-size: clamp(11px, 2.5vw, 13px); letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease; pointer-events: auto; }
         .btn-style:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.3); }
-        
-        .btn-disabled { opacity: 0.5; pointer-events: none; }
-        
         #birthday-ui { display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; pointer-events: auto; text-align: center; }
         #bday-input { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.6); color: #fff; font-size: clamp(26px, 6vw, 35px); text-align: center; width: clamp(140px, 40vw, 180px); letter-spacing: 12px; outline: none; font-family: 'Courier New', Courier, monospace; font-weight: 300; margin-bottom: 35px; padding-bottom: 5px; transition: border-color 0.3s ease; }
         #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
@@ -71,7 +76,10 @@
 </head>
 <body>
     <div id="fade-in-overlay"></div>
-    <div id="bg-image"></div>
+    
+    <!-- ⬇️ 修改点 2：替换为 video 标签，必须带上 autoplay loop muted playsinline -->
+    <video id="bg-video" src="bg.mp4" autoplay loop muted playsinline></video>
+    
     <div id="glass-overlay"></div>
     <div id="ui-layer">
         <div id="intro-box">
@@ -81,7 +89,7 @@
         <button id="dive-btn" class="btn-style" onclick="showInput()">构建密钥</button>
         <div id="birthday-ui">
             <input type="text" id="bday-input" maxlength="4" placeholder="MMDD" autocomplete="off" pattern="\d*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
-            <button id="awaken-btn" class="btn-style btn-disabled">躯壳载入中...</button>
+            <button id="awaken-btn" class="btn-style">唤醒 Ghost</button>
         </div>
     </div>
     <div id="ghost-info">
@@ -97,11 +105,10 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script>
         window.onload = () => { document.getElementById('fade-in-overlay').style.opacity = '0'; }
-        
-        let scene, camera, renderer, linesGrass, metalFlower, bokehParticles, ghostMaterial, ghostLight;
+        let scene, camera, renderer, linesGrass, metalFlower, bokehParticles;
         const mouse = new THREE.Vector2(), targetFollow = new THREE.Vector3();
         let gardenActive = false, isAwakening = false;
         let currentScale = { x: 2.5, y: 2.5, z: 2.5 }, targetScale = { x: 2.5, y: 2.5, z: 2.5 };
@@ -146,7 +153,6 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.outputColorSpace = 'srgb';
             document.body.appendChild(renderer.domElement);
-            
             const envCanvas = document.createElement('canvas'); envCanvas.width = 64; envCanvas.height = 64;
             const envCtx = envCanvas.getContext('2d'); const envGrad = envCtx.createRadialGradient(32, 32, 0, 32, 32, 32); envGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); envGrad.addColorStop(1, 'rgba(10, 15, 20, 1)'); envCtx.fillStyle = envGrad; envCtx.fillRect(0, 0, 64, 64);
             scene.environment = new THREE.CanvasTexture(envCanvas); scene.environment.mapping = THREE.EquirectangularReflectionMapping;
@@ -178,40 +184,14 @@
             scene.add(bokehParticles);
 
             ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
-            
-            // ⚠️ 正确修复：用户名 moooori1023 (4 个 o)
-            const modelUrl = 'https://cdn.jsdelivr.net/gh/moooori1023/beyondtheshell@main/flower.obj';
-            
-            new THREE.OBJLoader().load(modelUrl, (o) => { 
-                o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); 
-                const box = new THREE.Box3().setFromObject(o); 
-                o.position.sub(box.getCenter(new THREE.Vector3())); 
-                metalFlower = new THREE.Group(); 
-                metalFlower.add(o); 
-                metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); 
-                metalFlower.position.y = 1.5; 
-                metalFlower.visible = false; 
-                scene.add(metalFlower); 
-                
-                const awakenBtn = document.getElementById('awaken-btn');
-                awakenBtn.innerText = '唤醒 Ghost';
-                awakenBtn.classList.remove('btn-disabled');
-            });
-
+            new THREE.OBJLoader().load('flower.obj', (o) => { o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); const box = new THREE.Box3().setFromObject(o); o.position.sub(box.getCenter(new THREE.Vector3())); metalFlower = new THREE.Group(); metalFlower.add(o); metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); metalFlower.position.y = 1.5; metalFlower.visible = false; scene.add(metalFlower); });
             ghostLight = new THREE.PointLight(0xffffff, 0, 12); scene.add(ghostLight); scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            
             window.addEventListener('resize', onWindowResize);
             window.addEventListener('mousemove', (e) => { mouse.x = (e.clientX/window.innerWidth)*2-1; mouse.y = -(e.clientY/window.innerHeight)*2+1; });
             window.addEventListener('touchmove', (e) => { if(e.touches.length>0) { mouse.x=(e.touches[0].clientX/window.innerWidth)*2-1; mouse.y=-(e.touches[0].clientY/window.innerHeight)*2+1; } }, { passive: true });
-            
             const btn = document.getElementById('awaken-btn');
             btn.addEventListener('click', awakenGhost);
             btn.addEventListener('touchstart', (e) => { e.preventDefault(); awakenGhost(); }, { passive: false });
-            
-            document.getElementById('bday-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') awakenGhost();
-            });
-
             animate();
         }
 
@@ -243,24 +223,9 @@
         function restoreOracle() { const og = document.getElementById('oracle-group'); const qe = document.getElementById('ghost-quote'); qe.style.display = 'none'; qe.classList.remove('fade-in-anim'); og.style.display = 'block'; og.classList.remove('dissolve-anim'); void og.offsetWidth; startOracleTimer(); }
 
         function awakenGhost() {
-            const inputVal = document.getElementById('bday-input').value; 
-            
-            if(inputVal.length !== 4) {
-                alert("请输入4位初始时间戳密钥（如：0203）");
-                return;
-            }
-            
+            const inputVal = document.getElementById('bday-input').value; if(inputVal.length !== 4) return;
             const month = parseInt(inputVal.substring(0, 2)), day = parseInt(inputVal.substring(2, 4));
-            if(month < 1 || month > 12 || day < 1 || day > 31) {
-                alert("系统无法识别该坐标，请输入有效的日期。");
-                return;
-            }
-
-            if (!metalFlower) {
-                alert("躯壳数据仍在重组中（模型未加载完成），请稍等片刻再试...");
-                return;
-            }
-
+            if(month < 1 || month > 12 || day < 1 || day > 31) return;
             let calcMonth = month, calcDay = day; if (inputVal === "0101") { calcMonth = 6; calcDay = 16; } else if (inputVal === "0616") { calcMonth = 1; calcDay = 1; }
             let colorDesc = "", phaseName = "", finalHue = 0;
             ghostMaterial.color.set('#fff'); ghostMaterial.emissive.set('#000'); ghostMaterial.metalness = 0; ghostMaterial.roughness = 0.5; ghostMaterial.transmission = 0; ghostMaterial.ior = 1.5; ghostMaterial.thickness = 0; ghostMaterial.opacity = 1;
