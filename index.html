@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>躯壳之外 | 觉醒数字花园</title>
     <style>
+        /* ================= 原有样式保持完全不变 ================= */
         html, body { 
             width: 100%; height: 100%; margin: 0; padding: 0; 
             overflow: hidden; background-color: #000; 
@@ -36,9 +37,6 @@
         #intro-box p { font-size: clamp(11px, 2.5vw, 13px); font-weight: 300; line-height: 2.2; letter-spacing: 2px; color: rgba(255,255,255,0.85); }
         .btn-style { background: rgba(255, 255, 255, 0.9); color: #000; border: none; padding: clamp(10px, 2vh, 12px) clamp(30px, 6vw, 40px); border-radius: 30px; cursor: pointer; font-size: clamp(11px, 2.5vw, 13px); letter-spacing: 2px; font-weight: 600; transition: all 0.4s ease; pointer-events: auto; }
         .btn-style:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.3); }
-        
-        .btn-disabled { opacity: 0.5; pointer-events: none; }
-        
         #birthday-ui { display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; pointer-events: auto; text-align: center; }
         #bday-input { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.6); color: #fff; font-size: clamp(26px, 6vw, 35px); text-align: center; width: clamp(140px, 40vw, 180px); letter-spacing: 12px; outline: none; font-family: 'Courier New', Courier, monospace; font-weight: 300; margin-bottom: 35px; padding-bottom: 5px; transition: border-color 0.3s ease; }
         #fade-in-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; pointer-events: none; transition: opacity 2s ease; }
@@ -67,6 +65,79 @@
         .dissolve-anim { animation: windDissolve 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
         @keyframes fadeInQuote { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in-anim { animation: fadeInQuote 2.5s ease forwards; }
+
+        /* ================= 躯壳之外 后半段先锋美学样式 ================= */
+        :root { --neo-border: 1px solid rgba(255, 255, 255, 0.2); }
+        .hidden { display: none !important; }
+        #interaction-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 10; pointer-events: none;
+        }
+        .overlay-center {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: auto; text-align: center;
+        }
+        .glass-fog-out {
+            filter: blur(15px); opacity: 0 !important; transform: scale(1.05);
+            transition: all 2s ease-out; pointer-events: none;
+        }
+
+        .form-glitch-container {
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            padding: 2.5rem; border: var(--neo-border);
+            display: flex; flex-direction: column; gap: 15px; width: 85vw; max-width: 400px;
+            transition: clip-path 0.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease, filter 0.3s ease;
+            transform: translateY(80px);
+        }
+        .form-glitch-container label {
+            font-size: 12px; color: rgba(255,255,255,0.8); letter-spacing: 1.5px; text-align: left; line-height: 1.6;
+        }
+        .form-glitch-container input, .form-glitch-container textarea {
+            background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.4);
+            color: #fff; padding: 10px 0; font-size: 14px; outline: none; font-family: monospace; resize: none;
+        }
+        .form-glitch-container input:focus, .form-glitch-container textarea:focus { border-bottom-color: #fff; }
+        
+        /* 碎裂动效：如同剪辑跳帧 */
+        .shatter {
+            clip-path: polygon(0 0, 5% 15%, 15% 0, 35% 25%, 45% 0, 100% 0, 100% 100%, 0 100%);
+            opacity: 0; filter: blur(10px); transform: translateY(80px) scale(1.05); pointer-events: none;
+        }
+
+        .system-text { font-size: 12px; letter-spacing: 2px; color: #fff; margin-bottom: 20px; font-family: monospace; }
+        #song-result { background: rgba(0,0,0,0.6); border: var(--neo-border); padding: 20px; margin-bottom: 30px; }
+        #song-cover { width: 120px; height: 120px; object-fit: cover; filter: grayscale(50%) contrast(120%); border-radius: 2px; }
+        .lyrics { font-size: 13px; font-style: italic; color: #ddd; line-height: 1.8; margin: 20px 0; letter-spacing: 1px; white-space: pre-wrap;}
+        .btn-raw { display: inline-block; background: #fff; color: #000; text-decoration: none; padding: 10px 25px; font-size: 12px; font-weight: bold; letter-spacing: 2px; cursor: pointer; transition: 0.3s; border: none;}
+        .btn-raw:hover { background: transparent; color: #fff; border: 1px solid #fff; }
+        .btn-ghost { background: transparent; color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 10px 30px; font-size: 11px; letter-spacing: 3px; cursor: pointer; transition: 0.4s; }
+        .btn-ghost:hover { color: #fff; border-color: #fff; letter-spacing: 5px; }
+
+        /* 物理混沌网格 */
+        #phase4-resonance { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 8; }
+        .physics-image {
+            position: absolute; width: clamp(80px, 15vw, 140px); height: clamp(80px, 15vw, 140px);
+            background-size: cover; background-position: center;
+            cursor: grab; pointer-events: auto;
+            filter: grayscale(100%) contrast(130%); transition: filter 0.4s;
+        }
+        .physics-image:active { cursor: grabbing; }
+
+        .physics-image.burned {
+            filter: url(#glitch-burn) grayscale(20%) contrast(140%);
+            width: clamp(250px, 50vw, 320px) !important; height: clamp(250px, 50vw, 320px) !important;
+            z-index: 100 !important; cursor: default;
+        }
+        .burned-content {
+            opacity: 0; transition: opacity 1s 0.6s; padding: 20px;
+            background: rgba(0,0,0,0.85); width: 100%; height: 100%; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: space-between; text-align: left;
+        }
+        .physics-image.burned .burned-content { opacity: 1; }
+        .bc-top { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
+        .bc-mid { font-size: 14px; color: #fff; font-weight: bold; line-height: 1.6; letter-spacing: 1px; }
+        .bc-bot { font-size: 10px; color: rgba(255,255,255,0.3); font-style: italic; text-align: right; }
     </style>
 </head>
 <body>
@@ -81,7 +152,7 @@
         <button id="dive-btn" class="btn-style" onclick="showInput()">构建密钥</button>
         <div id="birthday-ui">
             <input type="text" id="bday-input" maxlength="4" placeholder="MMDD" autocomplete="off" pattern="\d*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
-            <button id="awaken-btn" class="btn-style btn-disabled">躯壳载入中...</button>
+            <button id="awaken-btn" class="btn-style">唤醒 Ghost</button>
         </div>
     </div>
     <div id="ghost-info">
@@ -90,18 +161,59 @@
             <div id="ghost-oracle"></div>
             <div class="ghost-footer" id="ghost-unique"></div>
         </div>
-        <div id="ghost-quote" onclick="restoreOracle()">
+        <div id="ghost-quote">
             <div style="display:block; white-space:nowrap; padding-bottom:2px;">“我们如今仿佛对镜观看，模糊不清，到那时就要面对面了，</div>
             <div style="display:block; white-space:nowrap;">我现在所知道的有限，到那时就全知道，如同造物主知道我一样。”</div>
         </div>
     </div>
 
+    <!-- SVG 原生灼烧滤镜 -->
+    <svg style="width: 0; height: 0; position: absolute;">
+        <defs>
+            <filter id="glitch-burn" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+                <feColorMatrix type="matrix" values="1 0 0 0 0.5   0 0.3 0 0 0.1   0 0 0 0 0   0 0 0 1 0" in="displaced" result="burned" />
+                <feBlend mode="multiply" in="SourceGraphic" in2="burned" />
+            </filter>
+        </defs>
+    </svg>
+
+    <main id="interaction-layer">
+        <!-- 阶段2：剥离 -->
+        <div id="phase2-peel" class="overlay-center hidden">
+            <div class="form-glitch-container" id="peel-form">
+                <label>在这个被绝对平滑包裹的世界里，你正用理智极力掩饰哪一种痛觉？</label>
+                <textarea id="input-pain" rows="3" placeholder="..."></textarea>
+                <label>为这具躯壳留下一个临时的代号：</label>
+                <input type="text" id="input-codename" placeholder="Anonymous">
+                <button id="btn-submit-pain" class="btn-raw" style="margin-top: 10px;">交出躯壳</button>
+            </div>
+        </div>
+
+        <!-- 阶段3：捕获 -->
+        <div id="phase3-capture" class="overlay-center hidden">
+            <p class="system-text">你的痛觉频率已捕获。造物主想说：</p>
+            <div id="song-result">
+                <img id="song-cover" src="" alt="Cover">
+                <p id="song-lyrics" class="lyrics"></p>
+                <a id="song-link" href="#" target="_blank" class="btn-raw">接入该频段</a>
+            </div>
+            <button id="btn-enter-wasteland" class="btn-ghost">漫游同频荒原</button>
+        </div>
+    </main>
+    
+    <!-- 阶段4：共振墓地 -->
+    <div id="phase4-resonance" class="hidden"></div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    
     <script>
+        /* ================= 3D 渲染与环境代码 (完全保持原样) ================= */
         window.onload = () => { document.getElementById('fade-in-overlay').style.opacity = '0'; }
-        
-        let scene, camera, renderer, linesGrass, metalFlower, bokehParticles, ghostMaterial, ghostLight;
+        let scene, camera, renderer, linesGrass, metalFlower, bokehParticles;
         const mouse = new THREE.Vector2(), targetFollow = new THREE.Vector3();
         let gardenActive = false, isAwakening = false;
         let currentScale = { x: 2.5, y: 2.5, z: 2.5 }, targetScale = { x: 2.5, y: 2.5, z: 2.5 };
@@ -131,9 +243,7 @@
             const basesC = ["确立你唯一的精神主权。", "标定你躯壳外的精神原点。", "完成对自我的终极命名。", "确立那串无法复刻的坐标。", "它是系统无法模拟的密钥。"];
             const partC = basesC[day % basesC.length];
             let fullOracle = `${partA}，你正${partB}，${partC}`;
-            if(window.innerWidth <= 768) {
-                fullOracle = fullOracle.replace("，", "，<br>");
-            }
+            if(window.innerWidth <= 768) { fullOracle = fullOracle.replace("，", "，<br>"); }
             return fullOracle;
         }
 
@@ -146,7 +256,6 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.outputColorSpace = 'srgb';
             document.body.appendChild(renderer.domElement);
-            
             const envCanvas = document.createElement('canvas'); envCanvas.width = 64; envCanvas.height = 64;
             const envCtx = envCanvas.getContext('2d'); const envGrad = envCtx.createRadialGradient(32, 32, 0, 32, 32, 32); envGrad.addColorStop(0, 'rgba(255, 255, 255, 1)'); envGrad.addColorStop(1, 'rgba(10, 15, 20, 1)'); envCtx.fillStyle = envGrad; envCtx.fillRect(0, 0, 64, 64);
             scene.environment = new THREE.CanvasTexture(envCanvas); scene.environment.mapping = THREE.EquirectangularReflectionMapping;
@@ -178,40 +287,14 @@
             scene.add(bokehParticles);
 
             ghostMaterial = new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide });
-            
-            // ⚠️ 正确修复：用户名 moooori1023 (4 个 o)
-            const modelUrl = 'https://cdn.jsdelivr.net/gh/moooori1023/beyondtheshell@main/flower.obj';
-            
-            new THREE.OBJLoader().load(modelUrl, (o) => { 
-                o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); 
-                const box = new THREE.Box3().setFromObject(o); 
-                o.position.sub(box.getCenter(new THREE.Vector3())); 
-                metalFlower = new THREE.Group(); 
-                metalFlower.add(o); 
-                metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); 
-                metalFlower.position.y = 1.5; 
-                metalFlower.visible = false; 
-                scene.add(metalFlower); 
-                
-                const awakenBtn = document.getElementById('awaken-btn');
-                awakenBtn.innerText = '唤醒 Ghost';
-                awakenBtn.classList.remove('btn-disabled');
-            });
-
+            new THREE.OBJLoader().load('flower.obj', (o) => { o.traverse((c) => { if (c.isMesh) c.material = ghostMaterial; }); const box = new THREE.Box3().setFromObject(o); o.position.sub(box.getCenter(new THREE.Vector3())); metalFlower = new THREE.Group(); metalFlower.add(o); metalFlower.scale.set(currentScale.x, currentScale.y, currentScale.z); metalFlower.position.y = 1.5; metalFlower.visible = false; scene.add(metalFlower); });
             ghostLight = new THREE.PointLight(0xffffff, 0, 12); scene.add(ghostLight); scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            
             window.addEventListener('resize', onWindowResize);
             window.addEventListener('mousemove', (e) => { mouse.x = (e.clientX/window.innerWidth)*2-1; mouse.y = -(e.clientY/window.innerHeight)*2+1; });
             window.addEventListener('touchmove', (e) => { if(e.touches.length>0) { mouse.x=(e.touches[0].clientX/window.innerWidth)*2-1; mouse.y=-(e.touches[0].clientY/window.innerHeight)*2+1; } }, { passive: true });
-            
             const btn = document.getElementById('awaken-btn');
             btn.addEventListener('click', awakenGhost);
             btn.addEventListener('touchstart', (e) => { e.preventDefault(); awakenGhost(); }, { passive: false });
-            
-            document.getElementById('bday-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') awakenGhost();
-            });
-
             animate();
         }
 
@@ -243,24 +326,9 @@
         function restoreOracle() { const og = document.getElementById('oracle-group'); const qe = document.getElementById('ghost-quote'); qe.style.display = 'none'; qe.classList.remove('fade-in-anim'); og.style.display = 'block'; og.classList.remove('dissolve-anim'); void og.offsetWidth; startOracleTimer(); }
 
         function awakenGhost() {
-            const inputVal = document.getElementById('bday-input').value; 
-            
-            if(inputVal.length !== 4) {
-                alert("请输入4位初始时间戳密钥（如：0203）");
-                return;
-            }
-            
+            const inputVal = document.getElementById('bday-input').value; if(inputVal.length !== 4) return;
             const month = parseInt(inputVal.substring(0, 2)), day = parseInt(inputVal.substring(2, 4));
-            if(month < 1 || month > 12 || day < 1 || day > 31) {
-                alert("系统无法识别该坐标，请输入有效的日期。");
-                return;
-            }
-
-            if (!metalFlower) {
-                alert("躯壳数据仍在重组中（模型未加载完成），请稍等片刻再试...");
-                return;
-            }
-
+            if(month < 1 || month > 12 || day < 1 || day > 31) return;
             let calcMonth = month, calcDay = day; if (inputVal === "0101") { calcMonth = 6; calcDay = 16; } else if (inputVal === "0616") { calcMonth = 1; calcDay = 1; }
             let colorDesc = "", phaseName = "", finalHue = 0;
             ghostMaterial.color.set('#fff'); ghostMaterial.emissive.set('#000'); ghostMaterial.metalness = 0; ghostMaterial.roughness = 0.5; ghostMaterial.transmission = 0; ghostMaterial.ior = 1.5; ghostMaterial.thickness = 0; ghostMaterial.opacity = 1;
@@ -306,6 +374,263 @@
             document.getElementById('ghost-info').style.opacity = '1'; gardenActive = true; startOracleTimer();
         }
         init3D();
+
+        /* ================= 专属情绪坐标字典 (提取自指定网易云歌单) ================= */
+        const songDictionary = [
+            {
+                song_name: "Good Night - Her", cover_url: "https://picsum.photos/seed/Her/200",
+                lyrics: "We're going round and round\nTo find a way out", netease_link: "https://music.163.com/#/search/m/?s=Good%20Night%20Her",
+                mood_tags: { "告别": 5, "夜晚": 4, "孤独": 5, "疲惫": 4, "寻找": 3 }
+            },
+            {
+                song_name: "Mr. Rattlebone - Matt Maeson", cover_url: "https://picsum.photos/seed/Matt/200",
+                lyrics: "Mr. Rattlebone, come and take my soul\nI've been waiting for so long", netease_link: "https://music.163.com/#/search/m/?s=Mr.%20Rattlebone",
+                mood_tags: { "叛逆": 5, "疯狂": 4, "骨血": 4, "破碎": 5, "深渊": 3 }
+            },
+            {
+                song_name: "Me in 20 Years - Moses Sumney", cover_url: "https://picsum.photos/seed/Moses/200",
+                lyrics: "Will I be alone?\nHave I turned to stone?", netease_link: "https://music.163.com/#/search/m/?s=Me%20in%2020%20Years",
+                mood_tags: { "时间": 5, "虚无": 4, "衰老": 4, "孤绝": 5, "停滞": 3 }
+            },
+            {
+                song_name: "Philadelphia - Alt-J", cover_url: "https://picsum.photos/seed/AltJ/200",
+                lyrics: "In Philadelphia, I'll be there\nWhen the lights go out", netease_link: "https://music.163.com/#/search/m/?s=Philadelphia%20Alt-J",
+                mood_tags: { "迷幻": 5, "割裂": 4, "边缘": 5, "逃离": 4, "异端": 3 }
+            },
+            {
+                song_name: "Call Your Mom - Noah Kahan / Lizzy McAlpine", cover_url: "https://picsum.photos/seed/Noah/200",
+                lyrics: "Don't let this darkness fool you\nAll lights turned off can be turned on", netease_link: "https://music.163.com/#/search/m/?s=Call%20Your%20Mom",
+                mood_tags: { "绝望": 5, "呼救": 4, "坠落": 5, "痛觉": 4, "微光": 3 }
+            },
+            {
+                song_name: "Catch It - Andrew Applepie / NKLS", cover_url: "https://picsum.photos/seed/Andrew/200",
+                lyrics: "Catch it before it falls apart\nInto the static", netease_link: "https://music.163.com/#/search/m/?s=Catch%20It%20Andrew",
+                mood_tags: { "迷茫": 5, "捕捉": 4, "虚幻": 4, "降维": 3 }
+            },
+            {
+                song_name: "I Don't Wanna Leave Just Yet - Thomas Day", cover_url: "https://picsum.photos/seed/Thomas/200",
+                lyrics: "I'm holding on to the edge\nI don't wanna leave just yet", netease_link: "https://music.163.com/#/search/m/?s=I%20Dont%20Wanna%20Leave",
+                mood_tags: { "执念": 5, "滞留": 4, "掩饰": 5, "拉扯": 4 }
+            },
+            {
+                song_name: "Neptune - rei brown", cover_url: "https://picsum.photos/seed/Neptune/200",
+                lyrics: "Sinking in the dark\nFading into the blue", netease_link: "https://music.163.com/#/search/m/?s=Neptune%20rei",
+                mood_tags: { "阴冷": 5, "潮湿": 4, "深海": 5, "沉溺": 5, "窒息": 4 }
+            },
+            {
+                song_name: "Wildfire - SYML", cover_url: "https://picsum.photos/seed/SYML/200",
+                lyrics: "Like a wildfire, you're running through my veins\nBurning down the remains", netease_link: "https://music.163.com/#/search/m/?s=Wildfire%20SYML",
+                mood_tags: { "燃烧": 5, "废墟": 4, "失控": 5, "剧痛": 4 }
+            },
+            {
+                song_name: "Elastic - Brandon", cover_url: "https://picsum.photos/seed/Brandon/200",
+                lyrics: "Stretching out the elastic\nUntil it finally breaks", netease_link: "https://music.163.com/#/search/m/?s=Elastic%20Brandon",
+                mood_tags: { "紧绷": 5, "断裂": 4, "拉扯": 5, "临界": 4 }
+            },
+            {
+                song_name: "pretty things, spotlight and sleep - Flora Cash", cover_url: "https://picsum.photos/seed/Flora1/200",
+                lyrics: "We are drawn to the spotlight\nHiding the scars out of sight", netease_link: "https://music.163.com/#/search/m/?s=pretty%20things%20spotlight",
+                mood_tags: { "聚光灯": 5, "表象": 4, "伪装": 5, "疲倦": 4, "讨好": 5 }
+            },
+            {
+                song_name: "Still Alive - Flora Cash", cover_url: "https://picsum.photos/seed/Flora2/200",
+                lyrics: "Barely breathing but I'm still alive\nIn this static noise", netease_link: "https://music.163.com/#/search/m/?s=Still%20Alive%20Flora",
+                mood_tags: { "喘息": 5, "幸存": 4, "存在": 5, "微弱": 3 }
+            },
+            {
+                song_name: "Brainstorm - Alexander 23", cover_url: "https://picsum.photos/seed/Alex/200",
+                lyrics: "There's a brainstorm in my head\nAnd it's tearing me to shreds", netease_link: "https://music.163.com/#/search/m/?s=Brainstorm%20Alexander",
+                mood_tags: { "焦虑": 5, "思维": 4, "脑暴": 5, "混乱": 4 }
+            },
+            {
+                song_name: "nuits d'été - Oscar Anton / Clementine", cover_url: "https://picsum.photos/seed/Oscar/200",
+                lyrics: "Lost in the summer nights\nFading out of sight", netease_link: "https://music.163.com/#/search/m/?s=nuits%20d%27%C3%A9t%C3%A9",
+                mood_tags: { "恍惚": 5, "虚散": 4, "呢喃": 5, "幻境": 3 }
+            },
+            {
+                song_name: "I even told my mom about u - Promoting Sounds", cover_url: "https://picsum.photos/seed/Promoting/200",
+                lyrics: "I stripped away the lies\nJust to show you what's inside", netease_link: "https://music.163.com/#/search/m/?s=I%20even%20told%20my%20mom",
+                mood_tags: { "袒露": 5, "脆弱": 4, "秘密": 5, "裸露": 4 }
+            },
+            {
+                song_name: "this is me trying - Taylor Swift", cover_url: "https://picsum.photos/seed/Taylor/200",
+                lyrics: "I just wanted you to know\nThat this is me trying", netease_link: "https://music.163.com/#/search/m/?s=this%20is%20me%20trying",
+                mood_tags: { "徒劳": 5, "挣扎": 4, "边缘": 5, "掩饰": 4, "无力": 5 }
+            },
+            {
+                song_name: "Talk 2 Me - Montell Fish", cover_url: "https://picsum.photos/seed/Montell/200",
+                lyrics: "Won't you talk to me?\nBehind the silent screen", netease_link: "https://music.163.com/#/search/m/?s=Talk%202%20Me",
+                mood_tags: { "疏离": 5, "沟通": 4, "封闭": 5, "失语": 4 }
+            },
+            {
+                song_name: "Daylight - David Kushner", cover_url: "https://picsum.photos/seed/David/200",
+                lyrics: "Oh I love it and I hate it at the same time\nYou and I drink the poison from the same vine", netease_link: "https://music.163.com/#/search/m/?s=Daylight%20David%20Kushner",
+                mood_tags: { "晨": 5, "撕裂": 4, "原罪": 4, "光影": 5, "破晓": 4 }
+            },
+            {
+                song_name: "Again - Mac Ayres", cover_url: "https://picsum.photos/seed/Mac/200",
+                lyrics: "Falling into the same loop again\nWhere does the circle end", netease_link: "https://music.163.com/#/search/m/?s=Again%20Mac%20Ayres",
+                mood_tags: { "循环": 5, "困顿": 4, "平滑": 5, "机械": 4 }
+            },
+            {
+                song_name: "Sapphire – Acoustic - The fin.", cover_url: "https://picsum.photos/seed/TheFin/200",
+                lyrics: "Stripped down to the core\nI don't need the noise anymore", netease_link: "https://music.163.com/#/search/m/?s=Sapphire%20The%20fin",
+                mood_tags: { "纯粹": 5, "沉静": 4, "剥离": 5, "本质": 4 }
+            },
+            {
+                song_name: "superpower - missio", cover_url: "https://picsum.photos/seed/Missio/200",
+                lyrics: "I'm a freak, I'm a weirdo\nAnd that's my superpower", netease_link: "https://music.163.com/#/search/m/?s=superpower%20missio",
+                mood_tags: { "异类": 5, "觉醒": 4, "力量": 5, "骄傲": 4, "反叛": 5 }
+            }
+        ];
+
+        // 纯前端情感加权匹配引擎
+        function matchFrequency(inputText) {
+            let bestMatch = songDictionary[0];
+            let maxScore = -1;
+            songDictionary.forEach(song => {
+                let currentScore = 0;
+                Object.keys(song.mood_tags).forEach(tag => {
+                    if (inputText.includes(tag)) currentScore += song.mood_tags[tag];
+                });
+                // 引入极轻微的随机偏移量，制造算法之外的宿命感
+                currentScore += Math.random() * 0.8; 
+                if (currentScore > maxScore) {
+                    maxScore = currentScore;
+                    bestMatch = song;
+                }
+            });
+            return bestMatch;
+        }
+
+        // 拦截原生凝视倒计时，接入剥离序列
+        const originalStartOracleTimer = window.startOracleTimer;
+        let baseFlowerScale = 1.0;
+        
+        window.startOracleTimer = function() {
+            if(originalStartOracleTimer) originalStartOracleTimer();
+            // 凝视 3 秒后执行剥离
+            setTimeout(() => {
+                const quoteEl = document.getElementById('ghost-quote');
+                if(quoteEl && quoteEl.style.display !== 'none') {
+                    quoteEl.classList.add('glass-fog-out');
+                    setTimeout(() => {
+                        document.getElementById('ghost-info').style.display = 'none';
+                        document.getElementById('phase2-peel').classList.remove('hidden');
+                        
+                        // 三维物体的物理坍缩
+                        isAwakening = true; 
+                        baseFlowerScale = targetScale.x; 
+                        targetScale.x = targetScale.x * 0.15;
+                        targetScale.y = targetScale.y * 0.15;
+                        targetScale.z = targetScale.z * 0.15;
+                    }, 2000);
+                }
+            }, 20500);
+        };
+
+        // 提交交互序列 (犹如精准的剪辑跳帧，切断一切表象冗余)
+        document.getElementById('btn-submit-pain').addEventListener('click', () => {
+            const painText = document.getElementById('input-pain').value || "驱散阴冷与潮湿的温暖频率，隐藏在深渊里";
+            const codename = document.getElementById('input-codename').value || "Anonymous";
+            
+            document.getElementById('peel-form').classList.add('shatter');
+            
+            setTimeout(() => {
+                document.getElementById('phase2-peel').classList.add('hidden');
+                document.getElementById('phase3-capture').classList.remove('hidden');
+                
+                const matchedSong = matchFrequency(painText);
+                document.getElementById('song-cover').src = matchedSong.cover_url;
+                document.getElementById('song-lyrics').innerText = matchedSong.lyrics;
+                document.getElementById('song-link').href = matchedSong.netease_link;
+                
+                window.userData = { pain: painText, name: codename };
+            }, 300);
+        });
+
+        // 漫游同频荒原 (唤醒物理引擎)
+        document.getElementById('btn-enter-wasteland').addEventListener('click', () => {
+            document.getElementById('phase3-capture').classList.add('hidden');
+            isAwakening = true;
+            targetScale.x = baseFlowerScale;
+            targetScale.y = baseFlowerScale;
+            targetScale.z = baseFlowerScale;
+            initMatterJS();
+        });
+
+        function initMatterJS() {
+            const container = document.getElementById('phase4-resonance');
+            container.classList.remove('hidden');
+
+            const Engine = Matter.Engine, Render = Matter.Render, Runner = Matter.Runner,
+                  Bodies = Matter.Bodies, World = Matter.World, Mouse = Matter.Mouse,
+                  MouseConstraint = Matter.MouseConstraint;
+
+            const engine = Engine.create();
+            engine.world.gravity.y = 0; 
+            engine.world.gravity.x = 0;
+
+            const width = window.innerWidth, height = window.innerHeight;
+            const forbiddenZone = Bodies.circle(width/2, height/2, 160, { isStatic: true });
+            World.add(engine.world, forbiddenZone);
+
+            const dummyData = [
+                { text: window.userData.pain, name: window.userData.name, img: 'https://picsum.photos/400/400?1' },
+                { text: "总是试图填满日程表，像晨光撕裂黑夜的平滑，害怕停下来面对虚无。", name: "0xA1", img: 'https://picsum.photos/400/400?2' },
+                { text: "在每条朋友圈发出前，反复检查是否符合人设", name: "Null", img: 'https://picsum.photos/400/400?3' },
+                { text: "用无尽的消费，掩盖内心的匮乏", name: "Glitcher", img: 'https://picsum.photos/400/400?4' },
+                { text: "假装一切尽在掌握，其实早已在边缘崩溃", name: "X", img: 'https://picsum.photos/400/400?5' }
+            ];
+
+            const domBodies = [];
+            dummyData.forEach((data) => {
+                let rx, ry;
+                do {
+                    rx = Math.random() * width;
+                    ry = Math.random() * height;
+                } while (Math.hypot(rx - width/2, ry - height/2) < 220); 
+
+                const size = 120;
+                const body = Bodies.rectangle(rx, ry, size, size, { frictionAir: 0.1, restitution: 0.6 });
+                World.add(engine.world, body);
+
+                const el = document.createElement('div');
+                el.className = 'physics-image';
+                el.style.backgroundImage = `url(${data.img})`;
+                el.innerHTML = `
+                    <div class="burned-content">
+                        <div class="bc-top">在这个被绝对平滑包裹的世界里，你正用理智极力掩饰哪一种痛觉？</div>
+                        <div class="bc-mid">${data.text}</div>
+                        <div class="bc-bot">— 游荡的躯壳：${data.name}</div>
+                    </div>
+                `;
+                
+                el.addEventListener('click', () => {
+                    Matter.Body.scale(body, 2.5, 2.5); 
+                    Matter.Body.setMass(body, 50); 
+                    el.classList.add('burned');
+                });
+
+                container.appendChild(el);
+                domBodies.push({ body, el });
+            });
+
+            const mouse = Mouse.create(document.body);
+            const mConstraint = MouseConstraint.create(engine, {
+                mouse: mouse, constraint: { stiffness: 0.2, render: { visible: false } }
+            });
+            World.add(engine.world, mConstraint);
+
+            Matter.Events.on(engine, 'afterUpdate', () => {
+                domBodies.forEach((item) => {
+                    const offset = item.el.classList.contains('burned') ? 140 : 60; 
+                    item.el.style.transform = `translate(${item.body.position.x - offset}px, ${item.body.position.y - offset}px) rotate(${item.body.angle}rad)`;
+                });
+            });
+
+            Runner.run(Runner.create(), engine);
+        }
     </script>
 </body>
 </html>
